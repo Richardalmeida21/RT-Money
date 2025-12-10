@@ -9,7 +9,9 @@ import {
     serverTimestamp,
     orderBy
 } from "firebase/firestore";
-import { db } from "./firebase";
+import { db, storage } from "./firebase";
+
+export { storage };
 
 export const addTransaction = async (userId, transaction) => {
     try {

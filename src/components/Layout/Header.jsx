@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Bell, ChevronDown, User, ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react";
+import { Bell, ChevronDown, ChevronLeft, ChevronRight, Eye, EyeOff, User } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useFilter } from "../../context/FilterContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function Header() {
     const { user } = useAuth();
-    const { filterParams, setFilterParams } = useFilter();
+    const { filterParams, setFilterParams, isValuesVisible, setIsValuesVisible } = useFilter();
+    const { t } = useLanguage();
     const [showPeriodMenu, setShowPeriodMenu] = useState(false);
 
     const handleMonthChange = (direction) => {
@@ -15,8 +17,8 @@ export default function Header() {
     };
 
     const toggleMsg = () => {
-        setFilterParams({ ...filterParams, isValuesVisible: !filterParams.isValuesVisible });
-    }
+        setIsValuesVisible(!isValuesVisible);
+    };
 
     const monthName = new Date(filterParams.value + "-02").toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
 
@@ -30,7 +32,7 @@ export default function Header() {
             backgroundColor: "transparent"
         }}>
             <div>
-                <h1 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>Visão Geral</h1>
+                <h1 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>{t('dashboard')}</h1>
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
@@ -122,9 +124,9 @@ export default function Header() {
                     <button
                         onClick={toggleMsg}
                         style={{ background: "var(--surface)", border: "none", padding: "0.5rem", borderRadius: "50%", cursor: "pointer", boxShadow: "var(--shadow)" }}
-                        title={filterParams.isValuesVisible ? "Ocultar valores" : "Mostrar valores"}
+                        title={isValuesVisible ? "Ocultar valores" : "Mostrar valores"}
                     >
-                        {filterParams.isValuesVisible ? <Eye size={20} color="var(--text-secondary)" /> : <EyeOff size={20} color="var(--text-secondary)" />}
+                        {isValuesVisible ? <Eye size={20} color="var(--text-secondary)" /> : <EyeOff size={20} color="var(--text-secondary)" />}
                     </button>
 
                     <button style={{ background: "var(--surface)", border: "none", padding: "0.5rem", borderRadius: "50%", cursor: "pointer", boxShadow: "var(--shadow)" }}>
@@ -133,11 +135,14 @@ export default function Header() {
 
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                         <div style={{ width: "40px", height: "40px", backgroundColor: "#ddd", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-                            {/* Placeholder Avatar */}
-                            <User size={24} color="#666" />
+                            {user?.photoURL ? (
+                                <img src={user.photoURL} alt="User" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            ) : (
+                                <User size={24} color="#666" />
+                            )}
                         </div>
                         <div style={{ display: "flex", flexDirection: "column" }}>
-                            <span style={{ fontSize: "0.9rem", fontWeight: "600" }}>{user?.email?.split('@')[0]}</span>
+                            <span style={{ fontSize: "0.9rem", fontWeight: "600" }}>{user?.displayName || user?.email?.split('@')[0]}</span>
                             <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Usuário</span>
                         </div>
                     </div>

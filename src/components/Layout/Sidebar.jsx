@@ -1,17 +1,19 @@
 import { Home, LayoutDashboard, Target, PieChart, Settings, LogOut, CalendarClock } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function Sidebar() {
     const { pathname } = useLocation();
     const { logout } = useAuth();
+    const { t } = useLanguage();
 
     const links = [
-        { icon: <LayoutDashboard size={20} />, label: "Visão Geral", path: "/" },
-        { icon: <PieChart size={20} />, label: "Transações", path: "/transactions" },
-        { icon: <Target size={20} />, label: "Metas", path: "/goals" },
-        { icon: <CalendarClock size={20} />, label: "Contas a Pagar", path: "/debts" },
-        { icon: <Settings size={20} />, label: "Configurações", path: "/settings" },
+        { icon: <LayoutDashboard size={20} />, label: t('dashboard'), path: "/" },
+        { icon: <PieChart size={20} />, label: t('transactions'), path: "/transactions" },
+        { icon: <Target size={20} />, label: t('goals'), path: "/goals" },
+        { icon: <CalendarClock size={20} />, label: t('debts'), path: "/debts" },
+        { icon: <Settings size={20} />, label: t('settings'), path: "/settings" },
     ];
 
     return (
@@ -27,11 +29,8 @@ export default function Sidebar() {
             left: 0,
             top: 0
         }}>
-            <div style={{ marginBottom: "3rem", display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--primary)" }}>
-                <div style={{ padding: "0.5rem", background: "var(--primary)", borderRadius: "8px" }}>
-                    <Home color="white" size={24} />
-                </div>
-                <h2 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>RT Money</h2>
+            <div style={{ marginBottom: "3rem", display: "flex", justifyContent: "center", alignItems: "center", width: "100%" }}>
+                <img src="/logo.png" alt="RT Money Logo" style={{ width: "120px", height: "auto", objectFit: "contain" }} />
             </div>
 
             <nav style={{ display: "flex", flexDirection: "column", gap: "0.5rem", flex: 1 }}>
@@ -74,7 +73,7 @@ export default function Sidebar() {
                 }}
             >
                 <LogOut size={20} />
-                Sair
+                {t('logout')}
             </button>
         </aside>
     );

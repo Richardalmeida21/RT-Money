@@ -5,7 +5,8 @@ import {
     createUserWithEmailAndPassword,
     signOut
 } from "firebase/auth";
-import { auth } from "../services/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
+import { auth, db } from "../services/firebase";
 
 const AuthContext = createContext();
 
@@ -14,11 +15,39 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
-            setLoading(false);
+        let unsubscribeFirestore = null;
+
+        const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+            if (currentUser) {
+                // Subscribe to additional user data in Firestore
+                const userRef = doc(db, "users", currentUser.uid);
+                unsubscribeFirestore = onSnapshot(userRef, (docSnap) => {
+                    const userData = docSnap.exists() ? docSnap.data() : {};
+
+                    // Merge Auth user with Firestore data
+                    // Firestore photoBase64 takes precedence over Auth photoURL
+                    setUser({
+                        ...currentUser,
+                        ...userData,
+                        photoURL: userData.photoBase64 || currentUser.photoURL
+                    });
+                    setLoading(false);
+                }, (error) => {
+                    console.error("Error fetching user profile:", error);
+                    setUser(currentUser); // Fallback to basic auth user
+                    setLoading(false);
+                });
+            } else {
+                if (unsubscribeFirestore) unsubscribeFirestore();
+                setUser(null);
+                setLoading(false);
+            }
         });
-        return () => unsubscribe();
+
+        return () => {
+            unsubscribeAuth();
+            if (unsubscribeFirestore) unsubscribeFirestore();
+        };
     }, []);
 
     const login = (email, password) => {
