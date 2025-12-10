@@ -34,6 +34,13 @@ export default function SettingsPage() {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: "", text: "" });
 
+    const [imgError, setImgError] = useState(false);
+
+    // Reset error when photoURL changes
+    useEffect(() => {
+        setImgError(false);
+    }, [photoURL]);
+
     const handleLanguageChange = (e) => {
         setLanguage(e.target.value);
     };
@@ -148,8 +155,17 @@ export default function SettingsPage() {
 
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "2rem" }}>
                         <div style={{ position: "relative", width: "100px", height: "100px" }}>
-                            {photoURL ? (
-                                <img src={photoURL} alt="Profile" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover", border: "4px solid var(--background)" }} />
+
+
+
+
+                            {photoURL && !imgError ? (
+                                <img
+                                    src={photoURL}
+                                    alt="Profile"
+                                    style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover", border: "4px solid var(--background)" }}
+                                    onError={() => setImgError(true)}
+                                />
                             ) : (
                                 <div style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                     <UserIcon size={48} color="#aaa" />

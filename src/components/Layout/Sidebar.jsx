@@ -32,7 +32,7 @@ export default function Sidebar() {
             top: 0
         }}>
             <div style={{ marginBottom: "3rem", display: "flex", justifyContent: "center", alignItems: "center", width: "100%" }}>
-                <img src={theme === 'dark' ? "/logo-dark.png" : "/logo.png"} alt="RT Money Logo" style={{ width: "120px", height: "auto", objectFit: "contain" }} />
+                <img src={theme === 'dark' ? "/logo-light.png" : "/logo-dark.png"} alt="RT Money Logo" style={{ width: "120px", height: "auto", objectFit: "contain" }} />
             </div>
 
             <nav style={{ display: "flex", flexDirection: "column", gap: "0.5rem", flex: 1 }}>

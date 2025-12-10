@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Bell, ChevronDown, ChevronLeft, ChevronRight, Eye, EyeOff, User } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useFilter } from "../../context/FilterContext";
@@ -12,6 +12,13 @@ export default function Header() {
     const { t, language } = useLanguage();
     const [showPeriodMenu, setShowPeriodMenu] = useState(false);
     const location = useLocation();
+
+    const [imgError, setImgError] = useState(false);
+
+    // Reset error if user photo changes
+    useEffect(() => {
+        setImgError(false);
+    }, [user?.photoURL]);
 
     const handleMonthChange = (direction) => {
         const [year, month] = filterParams.value.split('-').map(Number);
@@ -138,8 +145,17 @@ export default function Header() {
 
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                         <div style={{ width: "40px", height: "40px", backgroundColor: "#ddd", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-                            {user?.photoURL ? (
-                                <img src={user.photoURL} alt="User" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+
+
+
+
+                            {user?.photoURL && !imgError ? (
+                                <img
+                                    src={user.photoURL}
+                                    alt="User"
+                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                    onError={() => setImgError(true)}
+                                />
                             ) : (
                                 <User size={24} color="#666" />
                             )}
