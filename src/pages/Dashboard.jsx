@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useFilter } from "../context/FilterContext";
 import { addTransaction, getTransactions, deleteTransaction } from "../services/dbService";
 import Layout from "../components/Layout/Layout";
 import ImportTransactions from "../components/Transactions/ImportTransactions";
@@ -10,27 +11,46 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 export default function Dashboard() {
     const { user } = useAuth();
-    const [transactions, setTransactions] = useState([]);
+    const { filterParams } = useFilter();
+    const [allTransactions, setAllTransactions] = useState([]);
+    const [transactions, setTransactions] = useState([]); // Displayed transactions
     const [loading, setLoading] = useState(true);
     const [showImport, setShowImport] = useState(false);
-    const [newTransaction, setNewTransaction] = useState({
-        description: "",
-        amount: "",
-        type: "expense",
-        category: "Alimentação",
-        date: new Date().toISOString().split("T")[0]
-    });
 
     useEffect(() => {
         fetchTransactions();
     }, [user]);
+
+    // Filter whenever params or data changes
+    useEffect(() => {
+        if (!allTransactions.length) {
+            setTransactions([]);
+            return;
+        }
+
+        let filtered = allTransactions.filter(t => t.date); // Exclude invalid dates
+
+        if (filterParams.type === 'month') {
+            filtered = filtered.filter(t => t.date.startsWith(filterParams.value));
+        } else if (filterParams.type === 'custom') {
+            if (filterParams.startDate) {
+                filtered = filtered.filter(t => t.date >= filterParams.startDate);
+            }
+            if (filterParams.endDate) {
+                filtered = filtered.filter(t => t.date <= filterParams.endDate);
+            }
+        }
+
+        setTransactions(filtered);
+    }, [filterParams, allTransactions]);
 
     const fetchTransactions = async () => {
         if (user) {
             try {
                 const data = await getTransactions(user.uid);
                 data.sort((a, b) => new Date(b.date) - new Date(a.date));
-                setTransactions(data);
+                setAllTransactions(data);
+                // Initial filter will trigger via effect
             } catch (error) {
                 console.error("Failed to fetch transactions", error);
             } finally {
@@ -39,18 +59,7 @@ export default function Dashboard() {
         }
     };
 
-    const handleAddTransaction = async (e) => {
-        e.preventDefault();
-        if (!newTransaction.description || !newTransaction.amount) return;
 
-        try {
-            await addTransaction(user.uid, newTransaction);
-            setNewTransaction({ ...newTransaction, description: "", amount: "" });
-            fetchTransactions();
-        } catch (error) {
-            alert("Erro ao adicionar transação");
-        }
-    };
 
     const handleDelete = async (id) => {
         if (confirm("Tem certeza que deseja excluir esta transação?")) {
@@ -61,8 +70,9 @@ export default function Dashboard() {
 
     // Logic to determine type if it's ambiguous, but now we rely on the 'type' field which is set correctly by Import or Manual Add
     const calculateBalance = () => {
-        return transactions.reduce((acc, curr) => {
-            return curr.type === "income" ? acc + curr.amount : acc - curr.amount;
+        return allTransactions.reduce((acc, curr) => {
+            const amount = parseFloat(curr.amount) || 0;
+            return curr.type === "income" ? acc + amount : acc - amount;
         }, 0);
     };
 
@@ -101,7 +111,7 @@ export default function Dashboard() {
                             <Wallet size={20} color="#1967D2" />
                         </div>
                     </div>
-                    <h2 style={{ fontSize: "1.8rem" }}>R$ {calculateBalance().toFixed(2)}</h2>
+                    <h2 style={{ fontSize: "1.8rem" }}>{filterParams.isValuesVisible ? `R$ ${calculateBalance().toFixed(2)}` : "----"}</h2>
                 </div>
 
                 <div style={{ background: "white", padding: "1.5rem", borderRadius: "16px", boxShadow: "var(--shadow)" }}>
@@ -111,7 +121,7 @@ export default function Dashboard() {
                             <ArrowUpCircle size={20} color="#38A169" />
                         </div>
                     </div>
-                    <h2 style={{ fontSize: "1.8rem", color: "#38A169" }}>R$ {income.toFixed(2)}</h2>
+                    <h2 style={{ fontSize: "1.8rem", color: "#38A169" }}>{filterParams.isValuesVisible ? `R$ ${income.toFixed(2)}` : "----"}</h2>
                 </div>
 
                 <div style={{ background: "white", padding: "1.5rem", borderRadius: "16px", boxShadow: "var(--shadow)" }}>
@@ -121,32 +131,20 @@ export default function Dashboard() {
                             <ArrowDownCircle size={20} color="#E53E3E" />
                         </div>
                     </div>
-                    <h2 style={{ fontSize: "1.8rem", color: "#E53E3E" }}>R$ {expense.toFixed(2)}</h2>
+                    <h2 style={{ fontSize: "1.8rem", color: "#E53E3E" }}>{filterParams.isValuesVisible ? `R$ ${expense.toFixed(2)}` : "----"}</h2>
                 </div>
 
                 {/* Import Button */}
-                <div
-                    onClick={() => setShowImport(true)}
-                    style={{
-                        background: "white",
-                        padding: "1.5rem",
-                        borderRadius: "16px",
-                        boxShadow: "var(--shadow)",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        cursor: "pointer",
-                        border: "2px dashed var(--primary-light)",
-                        transition: "all 0.2s"
-                    }}
-                    onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
-                    onMouseOut={(e) => e.currentTarget.style.transform = "translateY(0)"}
-                >
-                    <div style={{ background: "#F3E8FF", padding: "1rem", borderRadius: "50%", marginBottom: "0.5rem" }}>
-                        <UploadCloud size={24} color="#6200EE" />
+                <div style={{ background: "white", padding: "1.5rem", borderRadius: "16px", boxShadow: "var(--shadow)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
+                        <span style={{ color: "#666" }}>Balanço do Período</span>
+                        <div style={{ background: "#F3E8FF", padding: "8px", borderRadius: "50%" }}>
+                            <Wallet size={20} color="#805AD5" />
+                        </div>
                     </div>
-                    <h3 style={{ color: "#6200EE", fontSize: "1rem" }}>Importar Extrato</h3>
+                    <h2 style={{ fontSize: "1.8rem", color: (income - expense) >= 0 ? "#38A169" : "#E53E3E" }}>
+                        {filterParams.isValuesVisible ? `R$ ${(income - expense).toFixed(2)}` : "----"}
+                    </h2>
                 </div>
 
             </section>

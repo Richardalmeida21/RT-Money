@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useFilter } from "../context/FilterContext";
 import { getTransactions, deleteTransaction } from "../services/dbService";
 import Layout from "../components/Layout/Layout";
 import ImportTransactions from "../components/Transactions/ImportTransactions";
@@ -8,6 +9,7 @@ import { Search, Filter, Trash2, UploadCloud, ChevronLeft, ChevronRight, Plus, A
 
 export default function TransactionsPage() {
     const { user } = useAuth();
+    const { filterParams } = useFilter(); // Use global filter
     const [transactions, setTransactions] = useState([]);
     const [filteredTransactions, setFilteredTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -15,8 +17,6 @@ export default function TransactionsPage() {
     const [showAdd, setShowAdd] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [filterType, setFilterType] = useState("all");
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
     const [selectedIds, setSelectedIds] = useState([]);
 
     useEffect(() => {
@@ -25,13 +25,18 @@ export default function TransactionsPage() {
 
     useEffect(() => {
         filterData();
-    }, [transactions, searchTerm, filterType, startDate, endDate]);
+    }, [transactions, searchTerm, filterType, filterParams]);
 
     const fetchTransactions = async () => {
         if (user) {
             try {
                 const data = await getTransactions(user.uid);
-                data.sort((a, b) => new Date(b.date) - new Date(a.date));
+                // Safe sort handling missing dates
+                data.sort((a, b) => {
+                    const dateA = a.date ? new Date(a.date) : new Date(0);
+                    const dateB = b.date ? new Date(b.date) : new Date(0);
+                    return dateB - dateA;
+                });
                 setTransactions(data);
             } catch (error) {
                 console.error("Failed to fetch transactions", error);
@@ -42,26 +47,31 @@ export default function TransactionsPage() {
     };
 
     const filterData = () => {
+        if (!filterParams) return; // Prevention against context issues
+
         let filtered = transactions;
 
         if (filterType !== 'all') {
             filtered = filtered.filter(t => t.type === filterType);
         }
 
-        if (startDate) {
-            filtered = filtered.filter(t => t.date >= startDate);
-        }
-
-        if (endDate) {
-            filtered = filtered.filter(t => t.date <= endDate);
+        if (filterParams.type === 'month') {
+            filtered = filtered.filter(t => t.date && t.date.startsWith(filterParams.value));
+        } else if (filterParams.type === 'custom') {
+            if (filterParams.startDate) {
+                filtered = filtered.filter(t => t.date >= filterParams.startDate);
+            }
+            if (filterParams.endDate) {
+                filtered = filtered.filter(t => t.date <= filterParams.endDate);
+            }
         }
 
         if (searchTerm) {
             const lowerTerm = searchTerm.toLowerCase();
             filtered = filtered.filter(t =>
-                t.description.toLowerCase().includes(lowerTerm) ||
-                t.category.toLowerCase().includes(lowerTerm) ||
-                t.amount.toString().includes(lowerTerm)
+                (t.description?.toLowerCase() || "").includes(lowerTerm) ||
+                (t.category?.toLowerCase() || "").includes(lowerTerm) ||
+                (t.amount?.toString() || "").includes(lowerTerm)
             );
         }
 
@@ -173,25 +183,7 @@ export default function TransactionsPage() {
                             />
                         </div>
 
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                            <span style={{ fontSize: "0.9rem", color: "#666" }}>De:</span>
-                            <input
-                                type="date"
-                                value={startDate}
-                                onChange={e => setStartDate(e.target.value)}
-                                style={{ padding: "0.8rem", borderRadius: "8px", border: "1px solid #ddd", background: "white" }}
-                            />
-                        </div>
 
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                            <span style={{ fontSize: "0.9rem", color: "#666" }}>Até:</span>
-                            <input
-                                type="date"
-                                value={endDate}
-                                onChange={e => setEndDate(e.target.value)}
-                                style={{ padding: "0.8rem", borderRadius: "8px", border: "1px solid #ddd", background: "white" }}
-                            />
-                        </div>
 
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                             <Filter size={20} color="#666" />
@@ -260,10 +252,10 @@ export default function TransactionsPage() {
                                         color: "#666",
                                         fontWeight: "bold"
                                     }}>
-                                        <span style={{ fontSize: "0.9rem" }}>{t.date.split('-')[2]}</span>
+                                        <span style={{ fontSize: "0.9rem" }}>{t.date ? t.date.split('-')[2] : '--'}</span>
                                         <span style={{ fontSize: "0.7rem", textTransform: "uppercase" }}>
                                             {/* Use a safe way to get month name without timezone shift */}
-                                            {new Date(t.date + "T12:00:00").toLocaleString('pt-BR', { month: 'short' }).replace('.', '')}
+                                            {t.date ? new Date(t.date + "T12:00:00").toLocaleString('pt-BR', { month: 'short' }).replace('.', '') : ''}
                                         </span>
                                     </div>
 

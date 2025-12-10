@@ -1,4 +1,4 @@
-import { Home, LayoutDashboard, Target, PieChart, Settings, LogOut } from "lucide-react";
+import { Home, LayoutDashboard, Target, PieChart, Settings, LogOut, CalendarClock } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -10,6 +10,7 @@ export default function Sidebar() {
         { icon: <LayoutDashboard size={20} />, label: "Visão Geral", path: "/" },
         { icon: <PieChart size={20} />, label: "Transações", path: "/transactions" },
         { icon: <Target size={20} />, label: "Metas", path: "/goals" },
+        { icon: <CalendarClock size={20} />, label: "Contas a Pagar", path: "/debts" },
         { icon: <Settings size={20} />, label: "Configurações", path: "/settings" },
     ];
 
