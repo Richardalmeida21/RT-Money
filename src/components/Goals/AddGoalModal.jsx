@@ -54,7 +54,7 @@ export default function AddGoalModal({ onClose, onSave, editingGoal }) {
             backgroundColor: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000
         }}>
             <div style={{
-                background: "white", padding: "2rem", borderRadius: "16px", width: "90%", maxWidth: "500px",
+                background: "var(--surface)", padding: "2rem", borderRadius: "16px", width: "90%", maxWidth: "500px",
                 boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
             }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
@@ -64,20 +64,20 @@ export default function AddGoalModal({ onClose, onSave, editingGoal }) {
 
                 <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                     <div>
-                        <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "#4A5568" }}>Nome da Meta</label>
+                        <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "var(--text-secondary)" }}>Nome da Meta</label>
                         <input
                             type="text"
                             required
                             placeholder="Ex: Viagem para Disney"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid #CBD5E0" }}
+                            style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid var(--border)", background: "var(--background)", color: "var(--text-primary)" }}
                         />
                     </div>
 
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                         <div>
-                            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "#4A5568" }}>Valor Alvo (R$)</label>
+                            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "var(--text-secondary)" }}>Valor Alvo (R$)</label>
                             <input
                                 type="number"
                                 required
@@ -86,11 +86,11 @@ export default function AddGoalModal({ onClose, onSave, editingGoal }) {
                                 placeholder="0.00"
                                 value={targetAmount}
                                 onChange={(e) => setTargetAmount(e.target.value)}
-                                style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid #CBD5E0" }}
+                                style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid var(--border)", background: "var(--background)", color: "var(--text-primary)" }}
                             />
                         </div>
                         <div>
-                            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "#4A5568" }}>Guardado (R$)</label>
+                            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "var(--text-secondary)" }}>Guardado (R$)</label>
                             <input
                                 type="number"
                                 min="0"
@@ -98,23 +98,23 @@ export default function AddGoalModal({ onClose, onSave, editingGoal }) {
                                 placeholder="0.00"
                                 value={currentAmount}
                                 onChange={(e) => setCurrentAmount(e.target.value)}
-                                style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid #CBD5E0" }}
+                                style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid var(--border)", background: "var(--background)", color: "var(--text-primary)" }}
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "#4A5568" }}>Prazo (Opcional)</label>
+                        <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "var(--text-secondary)" }}>Prazo (Opcional)</label>
                         <input
                             type="date"
                             value={deadline}
                             onChange={(e) => setDeadline(e.target.value)}
-                            style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid #CBD5E0" }}
+                            style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid var(--border)", background: "var(--background)", color: "var(--text-primary)" }}
                         />
                     </div>
 
                     <div>
-                        <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "#4A5568" }}>Cor</label>
+                        <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "var(--text-secondary)" }}>Cor</label>
                         <div style={{ display: "flex", gap: "0.8rem" }}>
                             {COLORS.map(c => (
                                 <div

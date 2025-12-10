@@ -2,11 +2,13 @@ import { Home, LayoutDashboard, Target, PieChart, Settings, LogOut, CalendarCloc
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function Sidebar() {
     const { pathname } = useLocation();
     const { logout } = useAuth();
     const { t } = useLanguage();
+    const { theme } = useTheme();
 
     const links = [
         { icon: <LayoutDashboard size={20} />, label: t('dashboard'), path: "/" },
@@ -30,7 +32,7 @@ export default function Sidebar() {
             top: 0
         }}>
             <div style={{ marginBottom: "3rem", display: "flex", justifyContent: "center", alignItems: "center", width: "100%" }}>
-                <img src="/logo.png" alt="RT Money Logo" style={{ width: "120px", height: "auto", objectFit: "contain" }} />
+                <img src={theme === 'dark' ? "/logo-dark.png" : "/logo.png"} alt="RT Money Logo" style={{ width: "120px", height: "auto", objectFit: "contain" }} />
             </div>
 
             <nav style={{ display: "flex", flexDirection: "column", gap: "0.5rem", flex: 1 }}>
@@ -47,11 +49,13 @@ export default function Sidebar() {
                             color: pathname === link.path ? "var(--primary)" : "var(--text-secondary)",
                             backgroundColor: pathname === link.path ? "rgba(98, 0, 238, 0.1)" : "transparent",
                             fontWeight: pathname === link.path ? "600" : "400",
-                            transition: "all 0.2s"
+                            transition: "all 0.2s",
+                            whiteSpace: "nowrap", // Prevent breaking but might overflow if too small
+                            // Alternatively, allow wrap but handle alignment
                         }}
                     >
-                        {link.icon}
-                        {link.label}
+                        <div style={{ minWidth: "20px" }}>{link.icon}</div>
+                        <span style={{ fontSize: "0.95rem" }}>{link.label}</span>
                     </Link>
                 ))}
             </nav>

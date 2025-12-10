@@ -45,7 +45,7 @@ export default function AddDebtModal({ onClose, onSave, editingDebt }) {
             backgroundColor: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000
         }}>
             <div style={{
-                background: "white", padding: "2rem", borderRadius: "16px", width: "90%", maxWidth: "500px",
+                background: "var(--surface)", padding: "2rem", borderRadius: "16px", width: "90%", maxWidth: "500px",
                 boxShadow: "0 10px 25px rgba(0,0,0,0.2)", maxHeight: "90vh", overflowY: "auto"
             }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
@@ -55,20 +55,20 @@ export default function AddDebtModal({ onClose, onSave, editingDebt }) {
 
                 <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                     <div>
-                        <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "#4A5568" }}>Descrição</label>
+                        <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "var(--text-secondary)" }}>Descrição</label>
                         <input
                             type="text"
                             required
                             placeholder="Ex: Fatura do Cartão"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid #CBD5E0" }}
+                            style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid var(--border)", background: "var(--background)", color: "var(--text-primary)" }}
                         />
                     </div>
 
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                         <div>
-                            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "#4A5568" }}>Valor (R$)</label>
+                            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "var(--text-secondary)" }}>Valor (R$)</label>
                             <input
                                 type="number"
                                 required
@@ -77,29 +77,29 @@ export default function AddDebtModal({ onClose, onSave, editingDebt }) {
                                 placeholder="0.00"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
-                                style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid #CBD5E0" }}
+                                style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid var(--border)", background: "var(--background)", color: "var(--text-primary)" }}
                             />
                         </div>
                         <div>
-                            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "#4A5568" }}>Vencimento</label>
+                            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "var(--text-secondary)" }}>Vencimento</label>
                             <input
                                 type="date"
                                 required
                                 value={dueDate}
                                 onChange={(e) => setDueDate(e.target.value)}
-                                style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid #CBD5E0" }}
+                                style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid var(--border)", background: "var(--background)", color: "var(--text-primary)" }}
                             />
                         </div>
                     </div>
 
                     {/* Notification Section */}
-                    <div style={{ background: "#F7FAFC", padding: "1rem", borderRadius: "8px", border: "1px dashed #CBD5E0" }}>
+                    <div style={{ background: "var(--background)", padding: "1rem", borderRadius: "8px", border: "1px dashed var(--border)" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.8rem", color: "#805AD5", fontWeight: "bold" }}>
                             <Bell size={18} />
                             <span>Agendar Lembrete</span>
                         </div>
 
-                        <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.9rem", color: "#4A5568" }}>Enviar aviso 1 dia antes por Email:</label>
+                        <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.9rem", color: "var(--text-secondary)" }}>Enviar aviso 1 dia antes por Email:</label>
                         <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
                             <label style={{ display: "flex", alignItems: "center", gap: "0.3rem", cursor: "pointer" }}>
                                 <input type="radio" name="notif" value="none" checked={notificationMethod === 'none'} onChange={(e) => setNotificationMethod(e.target.value)} />
@@ -113,7 +113,7 @@ export default function AddDebtModal({ onClose, onSave, editingDebt }) {
 
                         {notificationMethod === 'email' && (
                             <div>
-                                <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "#4A5568" }}>
+                                <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "var(--text-secondary)" }}>
                                     Email para aviso
                                 </label>
                                 <input
@@ -122,7 +122,7 @@ export default function AddDebtModal({ onClose, onSave, editingDebt }) {
                                     placeholder="seu@email.com"
                                     value={contactInfo}
                                     onChange={(e) => setContactInfo(e.target.value)}
-                                    style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid #CBD5E0" }}
+                                    style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid var(--border)", background: "var(--background)", color: "var(--text-primary)" }}
                                 />
                             </div>
                         )}

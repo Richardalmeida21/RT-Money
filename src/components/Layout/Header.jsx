@@ -4,11 +4,14 @@ import { useAuth } from "../../context/AuthContext";
 import { useFilter } from "../../context/FilterContext";
 import { useLanguage } from "../../context/LanguageContext";
 
+import { useLocation } from "react-router-dom";
+
 export default function Header() {
     const { user } = useAuth();
     const { filterParams, setFilterParams, isValuesVisible, setIsValuesVisible } = useFilter();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [showPeriodMenu, setShowPeriodMenu] = useState(false);
+    const location = useLocation();
 
     const handleMonthChange = (direction) => {
         const [year, month] = filterParams.value.split('-').map(Number);
@@ -20,7 +23,7 @@ export default function Header() {
         setIsValuesVisible(!isValuesVisible);
     };
 
-    const monthName = new Date(filterParams.value + "-02").toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+    const monthName = new Date(filterParams.value + "-02").toLocaleString(language === 'en' ? 'en-US' : 'pt-BR', { month: 'long', year: 'numeric' });
 
     return (
         <header style={{
@@ -32,7 +35,7 @@ export default function Header() {
             backgroundColor: "transparent"
         }}>
             <div>
-                <h1 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>{t('dashboard')}</h1>
+                {location.pathname === '/' && <h1 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>{t('dashboard')}</h1>}
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
@@ -43,7 +46,7 @@ export default function Header() {
                         display: "flex",
                         alignItems: "center",
                         gap: "0.5rem",
-                        background: "white",
+                        background: "var(--surface)",
                         padding: "0.5rem 1rem",
                         borderRadius: "20px",
                         boxShadow: "var(--shadow)",
@@ -53,23 +56,23 @@ export default function Header() {
                             onClick={() => setShowPeriodMenu(!showPeriodMenu)}
                             style={{
                                 display: "flex", alignItems: "center", gap: "5px", cursor: "pointer",
-                                marginRight: "10px", paddingRight: "10px", borderRight: "1px solid #eee", fontWeight: "bold", fontSize: "0.85rem", color: "#666"
+                                marginRight: "10px", paddingRight: "10px", borderRight: "1px solid var(--border)", fontWeight: "bold", fontSize: "0.85rem", color: "var(--text-secondary)"
                             }}>
-                            {filterParams.type === 'month' ? 'Mensal' : 'Período'} <ChevronDown size={14} />
+                            {filterParams.type === 'month' ? t('monthly') : t('period')} <ChevronDown size={14} />
                         </div>
 
                         {filterParams.type === 'month' ? (
                             <>
                                 <button onClick={() => handleMonthChange(-1)} style={{ border: "none", background: "none", cursor: "pointer", display: "flex" }}>
-                                    <ChevronLeft size={16} color="#666" />
+                                    <ChevronLeft size={16} color="var(--text-secondary)" />
                                 </button>
 
-                                <span style={{ minWidth: "100px", textAlign: "center", textTransform: "capitalize", fontWeight: "600", fontSize: "0.9rem" }}>
+                                <span style={{ minWidth: "100px", textAlign: "center", textTransform: "capitalize", fontWeight: "600", fontSize: "0.9rem", color: "var(--text-primary)" }}>
                                     {monthName}
                                 </span>
 
                                 <button onClick={() => handleMonthChange(1)} style={{ border: "none", background: "none", cursor: "pointer", display: "flex" }}>
-                                    <ChevronRight size={16} color="#666" />
+                                    <ChevronRight size={16} color="var(--text-secondary)" />
                                 </button>
                             </>
                         ) : (
@@ -78,14 +81,14 @@ export default function Header() {
                                     type="date"
                                     value={filterParams.startDate}
                                     onChange={(e) => setFilterParams({ ...filterParams, startDate: e.target.value })}
-                                    style={{ border: "1px solid #ddd", borderRadius: "5px", padding: "2px 5px", fontSize: "0.8rem", width: "110px" }}
+                                    style={{ border: "1px solid var(--border)", borderRadius: "5px", padding: "2px 5px", fontSize: "0.8rem", width: "110px", background: "var(--background)", color: "var(--text-primary)" }}
                                 />
-                                <span style={{ fontSize: "0.8rem", color: "#999" }}>até</span>
+                                <span style={{ fontSize: "0.8rem", color: "#999" }}>{t('to')}</span>
                                 <input
                                     type="date"
                                     value={filterParams.endDate}
                                     onChange={(e) => setFilterParams({ ...filterParams, endDate: e.target.value })}
-                                    style={{ border: "1px solid #ddd", borderRadius: "5px", padding: "2px 5px", fontSize: "0.8rem", width: "110px" }}
+                                    style={{ border: "1px solid var(--border)", borderRadius: "5px", padding: "2px 5px", fontSize: "0.8rem", width: "110px", background: "var(--background)", color: "var(--text-primary)" }}
                                 />
                             </div>
                         )}
@@ -96,7 +99,7 @@ export default function Header() {
                             position: "absolute",
                             top: "110%",
                             left: 0,
-                            background: "white",
+                            background: "var(--surface)",
                             boxShadow: "var(--shadow)",
                             borderRadius: "12px",
                             padding: "0.5rem",
@@ -108,13 +111,13 @@ export default function Header() {
                         }}>
                             <button
                                 onClick={() => { setFilterParams({ ...filterParams, type: 'month' }); setShowPeriodMenu(false); }}
-                                style={{ background: "none", border: "none", padding: "0.5rem", textAlign: "left", cursor: "pointer", fontWeight: filterParams.type === 'month' ? "bold" : "normal", borderRadius: "8px", backgroundColor: filterParams.type === 'month' ? "#f0f0f0" : "transparent" }}>
-                                Mensal
+                                style={{ background: "none", border: "none", padding: "0.5rem", textAlign: "left", cursor: "pointer", fontWeight: filterParams.type === 'month' ? "bold" : "normal", borderRadius: "8px", backgroundColor: filterParams.type === 'month' ? "var(--background)" : "transparent", color: "var(--text-primary)" }}>
+                                {t('monthly')}
                             </button>
                             <button
                                 onClick={() => { setFilterParams({ ...filterParams, type: 'custom' }); setShowPeriodMenu(false); }}
-                                style={{ background: "none", border: "none", padding: "0.5rem", textAlign: "left", cursor: "pointer", fontWeight: filterParams.type === 'custom' ? "bold" : "normal", borderRadius: "8px", backgroundColor: filterParams.type === 'custom' ? "#f0f0f0" : "transparent" }}>
-                                Personalizado
+                                style={{ background: "none", border: "none", padding: "0.5rem", textAlign: "left", cursor: "pointer", fontWeight: filterParams.type === 'custom' ? "bold" : "normal", borderRadius: "8px", backgroundColor: filterParams.type === 'custom' ? "var(--background)" : "transparent", color: "var(--text-primary)" }}>
+                                {t('custom')}
                             </button>
                         </div>
                     )}
@@ -143,7 +146,7 @@ export default function Header() {
                         </div>
                         <div style={{ display: "flex", flexDirection: "column" }}>
                             <span style={{ fontSize: "0.9rem", fontWeight: "600" }}>{user?.displayName || user?.email?.split('@')[0]}</span>
-                            <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Usuário</span>
+                            <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>{t('userRole')}</span>
                         </div>
                     </div>
                 </div>

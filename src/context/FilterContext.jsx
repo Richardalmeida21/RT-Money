@@ -8,11 +8,12 @@ export function FilterProvider({ children }) {
         value: new Date().toISOString().slice(0, 7), // YYYY-MM if type is month
         startDate: "", // Used if type is custom
         endDate: "",    // Used if type is custom
-        isValuesVisible: true // New privacy state
     });
 
+    const [isValuesVisible, setIsValuesVisible] = useState(true);
+
     return (
-        <FilterContext.Provider value={{ filterParams, setFilterParams }}>
+        <FilterContext.Provider value={{ filterParams, setFilterParams, isValuesVisible, setIsValuesVisible }}>
             {children}
         </FilterContext.Provider>
     );

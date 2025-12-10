@@ -6,10 +6,12 @@ import Layout from "../components/Layout/Layout";
 import ImportTransactions from "../components/Transactions/ImportTransactions";
 import AddTransactionModal from "../components/Transactions/AddTransactionModal";
 import { Search, Filter, Trash2, UploadCloud, ChevronLeft, ChevronRight, Plus, ArrowUpCircle, ArrowDownCircle, CheckSquare, Square } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function TransactionsPage() {
     const { user } = useAuth();
     const { filterParams } = useFilter(); // Use global filter
+    const { t, language } = useLanguage();
     const [transactions, setTransactions] = useState([]);
     const [filteredTransactions, setFilteredTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -79,14 +81,14 @@ export default function TransactionsPage() {
     };
 
     const handleDelete = async (id) => {
-        if (confirm("Tem certeza que deseja excluir esta transação permanentemente?")) {
+        if (confirm(t('deleteTransactionConfirm'))) {
             await deleteTransaction(user.uid, id);
             fetchTransactions();
         }
     };
 
     const handleBulkDelete = async () => {
-        if (confirm(`Tem certeza que deseja excluir ${selectedIds.length} transações?`)) {
+        if (confirm(`${t('deleteBulkConfirm')} ${selectedIds.length} ${t('transactions').toLowerCase()}?`)) {
             // Simple loop for now, can be optimized with batch later
             for (const id of selectedIds) {
                 await deleteTransaction(user.uid, id);
@@ -115,10 +117,10 @@ export default function TransactionsPage() {
     return (
         <Layout>
             <div style={{ marginBottom: "2rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <h1 style={{ fontSize: "1.8rem", fontWeight: "bold" }}>Transações</h1>
+                <h1 style={{ fontSize: "1.8rem", fontWeight: "bold" }}>{t('transactions')}</h1>
                 <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
                     <div style={{ color: "#666", marginRight: "1rem" }}>
-                        Total: <strong>{filteredTransactions.length}</strong>
+                        {t('total')}: <strong>{filteredTransactions.length}</strong>
                     </div>
                     <button
                         onClick={() => setShowAdd(true)}
@@ -135,7 +137,7 @@ export default function TransactionsPage() {
                         }}
                     >
                         <Plus size={18} />
-                        Nova Transação
+                        {t('addTransaction')}
                     </button>
                     <button
                         onClick={() => setShowImport(true)}
@@ -152,49 +154,49 @@ export default function TransactionsPage() {
                         }}
                     >
                         <UploadCloud size={18} />
-                        Importar
+                        {t('import')}
                     </button>
                 </div>
             </div>
 
             {/* Filters Bar */}
-            <div style={{ background: "white", padding: "1rem", borderRadius: "12px", boxShadow: "var(--shadow)", marginBottom: "1.5rem", display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "center" }}>
+            <div style={{ background: "var(--surface)", padding: "1rem", borderRadius: "12px", boxShadow: "var(--shadow)", marginBottom: "1.5rem", display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "center" }}>
 
                 {selectedIds.length > 0 ? (
                     <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "1rem", background: "#FFF5F5", padding: "0.8rem", borderRadius: "8px", border: "1px solid #FED7D7" }}>
-                        <span style={{ fontWeight: "bold", color: "#E53E3E" }}>{selectedIds.length} selecionados</span>
+                        <span style={{ fontWeight: "bold", color: "#E53E3E" }}>{selectedIds.length} {t('selected')}</span>
                         <button
                             onClick={handleBulkDelete}
                             style={{ background: "#E53E3E", color: "white", border: "none", padding: "0.5rem 1rem", borderRadius: "6px", cursor: "pointer", fontWeight: "bold", marginLeft: "auto" }}
                         >
-                            Excluir Selecionados
+                            {t('deleteSelected')}
                         </button>
                     </div>
                 ) : (
                     <>
-                        <div style={{ flex: 1, display: "flex", alignItems: "center", background: "#f5f6fa", borderRadius: "8px", padding: "0 1rem" }}>
-                            <Search size={20} color="#999" />
+                        <div style={{ flex: 1, display: "flex", alignItems: "center", background: "var(--background)", borderRadius: "8px", padding: "0 1rem" }}>
+                            <Search size={20} color="var(--text-secondary)" />
                             <input
                                 type="text"
-                                placeholder="Buscar por descrição, valor..."
+                                placeholder={t('searchPlaceholder')}
                                 value={searchTerm}
                                 onChange={e => setSearchTerm(e.target.value)}
-                                style={{ border: "none", background: "transparent", padding: "0.8rem", width: "100%", outline: "none" }}
+                                style={{ border: "none", background: "transparent", padding: "0.8rem", width: "100%", outline: "none", color: "var(--text-primary)" }}
                             />
                         </div>
 
 
 
                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                            <Filter size={20} color="#666" />
+                            <Filter size={20} color="var(--text-secondary)" />
                             <select
                                 value={filterType}
                                 onChange={e => setFilterType(e.target.value)}
-                                style={{ padding: "0.8rem", borderRadius: "8px", border: "1px solid #ddd", background: "white", cursor: "pointer" }}
+                                style={{ padding: "0.8rem", borderRadius: "8px", border: "1px solid var(--border)", background: "var(--surface)", cursor: "pointer", color: "var(--text-primary)" }}
                             >
-                                <option value="all">Todas</option>
-                                <option value="income">Entradas</option>
-                                <option value="expense">Saídas</option>
+                                <option value="all">{t('all')}</option>
+                                <option value="income">{t('income')}</option>
+                                <option value="expense">{t('expenses')}</option>
                             </select>
                         </div>
                     </>
@@ -211,29 +213,29 @@ export default function TransactionsPage() {
                         <Square size={20} color="#ccc" />
                     )}
                 </div>
-                <span style={{ fontSize: "0.9rem", color: "#666", fontWeight: "600" }}>Selecionar Todos</span>
+                <span style={{ fontSize: "0.9rem", color: "#666", fontWeight: "600" }}>{t('selectAll')}</span>
             </div>
 
             {/* Transactions List */}
-            <div style={{ background: "white", borderRadius: "16px", boxShadow: "var(--shadow)", overflow: 'hidden' }}>
+            <div style={{ background: "var(--surface)", borderRadius: "16px", boxShadow: "var(--shadow)", overflow: 'hidden' }}>
                 {loading ? (
-                    <div style={{ padding: "2rem", textAlign: "center", color: "#666" }}>Carregando...</div>
+                    <div style={{ padding: "2rem", textAlign: "center", color: "var(--text-secondary)" }}>{t('loading')}</div>
                 ) : (
                     <>
-                        {filteredTransactions.map((t, index) => (
-                            <div key={t.id} style={{
+                        {filteredTransactions.map((transaction, index) => (
+                            <div key={transaction.id} style={{
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "space-between",
                                 padding: "1.5rem",
-                                borderBottom: index !== filteredTransactions.length - 1 ? "1px solid #f0f0f0" : "none",
+                                borderBottom: index !== filteredTransactions.length - 1 ? "1px solid var(--border)" : "none",
                                 transition: "background 0.2s",
-                                backgroundColor: selectedIds.includes(t.id) ? "#F3E8FF" : "white"
+                                backgroundColor: selectedIds.includes(transaction.id) ? "#F3E8FF" : "var(--surface)"
                             }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
 
-                                    <div onClick={() => toggleSelect(t.id)} style={{ cursor: "pointer" }}>
-                                        {selectedIds.includes(t.id) ? (
+                                    <div onClick={() => toggleSelect(transaction.id)} style={{ cursor: "pointer" }}>
+                                        {selectedIds.includes(transaction.id) ? (
                                             <CheckSquare size={20} color="var(--primary)" />
                                         ) : (
                                             <Square size={20} color="#ccc" />
@@ -247,22 +249,22 @@ export default function TransactionsPage() {
                                         justifyContent: "center",
                                         width: "60px",
                                         height: "60px",
-                                        background: "#f8f9fa",
+                                        background: "var(--background)",
                                         borderRadius: "12px",
-                                        color: "#666",
+                                        color: "var(--text-secondary)",
                                         fontWeight: "bold"
                                     }}>
-                                        <span style={{ fontSize: "0.9rem" }}>{t.date ? t.date.split('-')[2] : '--'}</span>
+                                        <span style={{ fontSize: "0.9rem" }}>{transaction.date ? transaction.date.split('-')[2] : '--'}</span>
                                         <span style={{ fontSize: "0.7rem", textTransform: "uppercase" }}>
                                             {/* Use a safe way to get month name without timezone shift */}
-                                            {t.date ? new Date(t.date + "T12:00:00").toLocaleString('pt-BR', { month: 'short' }).replace('.', '') : ''}
+                                            {transaction.date ? new Date(transaction.date + "T12:00:00").toLocaleString(language === 'en' ? 'en-US' : 'pt-BR', { month: 'short' }).replace('.', '') : ''}
                                         </span>
                                     </div>
 
                                     <div>
-                                        <h3 style={{ fontSize: "1rem", marginBottom: "0.2rem", color: "#333" }}>{t.description}</h3>
-                                        <p style={{ fontSize: "0.85rem", color: "#888" }}>
-                                            {t.category === 'Geral' ? 'Sem Categoria' : t.category} • {t.type === 'income' ? 'Crédito' : 'Débito'}
+                                        <h3 style={{ fontSize: "1rem", marginBottom: "0.2rem", color: "var(--text-primary)" }}>{transaction.description}</h3>
+                                        <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+                                            {transaction.category === 'Geral' || transaction.category === 'Uncategorized' ? t('uncategorized') : transaction.category} • {transaction.type === 'income' ? t('credit') : t('debit')}
                                         </p>
                                     </div>
                                 </div>
@@ -271,14 +273,14 @@ export default function TransactionsPage() {
                                     <span style={{
                                         fontSize: "1.1rem",
                                         fontWeight: "bold",
-                                        color: t.type === 'income' ? '#38A169' : '#E53E3E'
+                                        color: transaction.type === 'income' ? '#38A169' : '#E53E3E'
                                     }}>
-                                        {t.type === 'income' ? '+ ' : '- '}
-                                        R$ {Math.abs(t.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                        {transaction.type === 'income' ? '+ ' : '- '}
+                                        R$ {Math.abs(transaction.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                     </span>
 
                                     <button
-                                        onClick={() => handleDelete(t.id)}
+                                        onClick={() => handleDelete(transaction.id)}
                                         style={{
                                             padding: "0.5rem",
                                             background: "#FFF5F5",
@@ -296,8 +298,8 @@ export default function TransactionsPage() {
                         ))}
 
                         {filteredTransactions.length === 0 && (
-                            <div style={{ padding: "3rem", textAlign: "center", color: "#999" }}>
-                                Nenhuma transação encontrada.
+                            <div style={{ padding: "3rem", textAlign: "center", color: "var(--text-secondary)" }}>
+                                {t('noTransactions')}
                             </div>
                         )}
                     </>

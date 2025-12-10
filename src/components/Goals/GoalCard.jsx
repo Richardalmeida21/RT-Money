@@ -17,7 +17,7 @@ export default function GoalCard({ goal, onAddMoney, onEdit, onDelete }) {
 
     return (
         <div style={{
-            background: "white",
+            background: "var(--surface)",
             borderRadius: "16px",
             padding: "1.5rem",
             boxShadow: "var(--shadow)",
@@ -39,9 +39,9 @@ export default function GoalCard({ goal, onAddMoney, onEdit, onDelete }) {
                         <Target size={24} color={goal.color || "#38A169"} />
                     </div>
                     <div>
-                        <h3 style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#333", marginBottom: "0.2rem" }}>{goal.title}</h3>
+                        <h3 style={{ fontSize: "1.1rem", fontWeight: "bold", color: "var(--text-primary)", marginBottom: "0.2rem" }}>{goal.title}</h3>
                         {daysRemaining !== null && (
-                            <span style={{ fontSize: "0.8rem", color: daysRemaining < 0 ? "#E53E3E" : "#666" }}>
+                            <span style={{ fontSize: "0.8rem", color: daysRemaining < 0 ? "#E53E3E" : "var(--text-secondary)" }}>
                                 {daysRemaining < 0 ? "Expirou" : `${daysRemaining} dias restantes`}
                             </span>
                         )}
@@ -67,16 +67,16 @@ export default function GoalCard({ goal, onAddMoney, onEdit, onDelete }) {
             {/* Amounts */}
             <div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "0.5rem" }}>
-                    <span style={{ fontSize: "1.4rem", fontWeight: "bold", color: "#333" }}>
+                    <span style={{ fontSize: "1.4rem", fontWeight: "bold", color: "var(--text-primary)" }}>
                         R$ {goal.currentAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </span>
-                    <span style={{ fontSize: "0.9rem", color: "#666" }}>
+                    <span style={{ fontSize: "0.9rem", color: "var(--text-secondary)" }}>
                         de R$ {goal.targetAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </span>
                 </div>
 
                 {/* Progress Bar */}
-                <div style={{ width: "100%", height: "8px", background: "#EDF2F7", borderRadius: "4px", overflow: "hidden" }}>
+                <div style={{ width: "100%", height: "8px", background: "var(--background)", borderRadius: "4px", overflow: "hidden" }}>
                     <div style={{
                         width: `${progress}%`,
                         height: "100%",
@@ -98,9 +98,9 @@ export default function GoalCard({ goal, onAddMoney, onEdit, onDelete }) {
                     width: "100%",
                     padding: "0.8rem",
                     borderRadius: "12px",
-                    border: "1px dashed #cbd5e0",
+                    border: "1px dashed var(--border)",
                     background: "transparent",
-                    color: "#4a5568",
+                    color: "var(--text-secondary)",
                     fontWeight: "600",
                     cursor: "pointer",
                     display: "flex",

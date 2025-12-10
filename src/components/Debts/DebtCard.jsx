@@ -22,7 +22,7 @@ export default function DebtCard({ debt, onPay, onEdit, onDelete }) {
 
     return (
         <div style={{
-            background: "white",
+            background: "var(--surface)",
             borderRadius: "16px",
             padding: "1.5rem",
             boxShadow: "var(--shadow)",
@@ -35,7 +35,7 @@ export default function DebtCard({ debt, onPay, onEdit, onDelete }) {
             {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                 <div>
-                    <h3 style={{ fontSize: "1.1rem", fontWeight: "bold", color: "#333", marginBottom: "0.2rem" }}>{debt.title}</h3>
+                    <h3 style={{ fontSize: "1.1rem", fontWeight: "bold", color: "var(--text-primary)", marginBottom: "0.2rem" }}>{debt.title}</h3>
                     <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: statusInfo.color, fontSize: "0.85rem", fontWeight: "600" }}>
                         {statusInfo.icon}
                         <span>{statusInfo.label}</span>
@@ -60,16 +60,16 @@ export default function DebtCard({ debt, onPay, onEdit, onDelete }) {
 
             {/* Amount */}
             <div style={{ marginTop: "0.5rem" }}>
-                <span style={{ fontSize: "1.5rem", fontWeight: "bold", color: "#333" }}>
+                <span style={{ fontSize: "1.5rem", fontWeight: "bold", color: "var(--text-primary)" }}>
                     R$ {parseFloat(debt.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </span>
-                <div style={{ fontSize: "0.9rem", color: "#666" }}>
+                <div style={{ fontSize: "0.9rem", color: "var(--text-secondary)" }}>
                     Vencimento: {new Date(debt.dueDate + "T00:00:00").toLocaleDateString('pt-BR')}
                 </div>
             </div>
 
             {/* Footer with Notification Info */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "0.5rem", paddingTop: "0.5rem", borderTop: "1px solid #eee" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "0.5rem", paddingTop: "0.5rem", borderTop: "1px solid var(--border)" }}>
                 {debt.notificationMethod !== 'none' && (
                     <div style={{ display: "flex", alignItems: "center", gap: "0.3rem", fontSize: "0.8rem", color: "#805AD5" }} title={`Notificar via ${debt.notificationMethod}`}>
                         <Bell size={14} />

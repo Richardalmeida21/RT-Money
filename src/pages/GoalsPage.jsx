@@ -5,9 +5,11 @@ import Layout from "../components/Layout/Layout";
 import GoalCard from "../components/Goals/GoalCard";
 import AddGoalModal from "../components/Goals/AddGoalModal";
 import { Plus, Target } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function GoalsPage() {
     const { user } = useAuth();
+    const { t } = useLanguage();
     const [goals, setGoals] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -41,14 +43,14 @@ export default function GoalsPage() {
     };
 
     const handleDeleteGoal = async (id) => {
-        if (confirm("Tem certeza que deseja excluir esta meta?")) {
+        if (confirm(t('deleteGoalConfirm'))) {
             await deleteGoal(user.uid, id);
             fetchGoals();
         }
     };
 
     const handleAddMoney = async (goal) => {
-        const amountStr = prompt(`Quanto deseja adicionar à meta "${goal.title}"?`, "0.00");
+        const amountStr = prompt(`${t('addMoneyPrompt')} "${goal.title}"?`, "0.00");
         if (amountStr) {
             const amount = parseFloat(amountStr.replace(',', '.'));
             if (!isNaN(amount) && amount > 0) {
@@ -63,7 +65,7 @@ export default function GoalsPage() {
     return (
         <Layout>
             <div style={{ marginBottom: "2rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <h1 style={{ fontSize: "1.8rem", fontWeight: "bold" }}>Metas Financeiras</h1>
+                <h1 style={{ fontSize: "1.8rem", fontWeight: "bold" }}>{t('goals')}</h1>
                 <button
                     onClick={() => { setEditingGoal(null); setShowModal(true); }}
                     style={{
@@ -79,19 +81,19 @@ export default function GoalsPage() {
                     }}
                 >
                     <Plus size={18} />
-                    Nova Meta
+                    {t('newGoal')}
                 </button>
             </div>
 
             {loading ? (
-                <div style={{ padding: "2rem", textAlign: "center", color: "#666" }}>Carregando metas...</div>
+                <div style={{ padding: "2rem", textAlign: "center", color: "var(--text-secondary)" }}>{t('loadingGoals')}</div>
             ) : (
                 <>
                     {goals.length === 0 ? (
                         <div style={{
                             textAlign: "center",
                             padding: "4rem 2rem",
-                            background: "white",
+                            background: "var(--surface)",
                             borderRadius: "16px",
                             boxShadow: "var(--shadow)",
                             display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem"
@@ -99,9 +101,9 @@ export default function GoalsPage() {
                             <div style={{ background: "#EDF2F7", padding: "1.5rem", borderRadius: "50%" }}>
                                 <Target size={48} color="#A0AEC0" />
                             </div>
-                            <h3 style={{ fontSize: "1.2rem", color: "#4A5568" }}>Nenhuma meta criada ainda</h3>
+                            <h3 style={{ fontSize: "1.2rem", color: "var(--text-primary)" }}>{t('noGoalsCreated')}</h3>
                             <p style={{ color: "#718096", maxWidth: "400px" }}>
-                                Defina objetivos financeiros e acompanhe seu progresso. Que tal começar criando uma meta para sua reserva de emergência?
+                                {t('goalsDescription')}
                             </p>
                             <button
                                 onClick={() => setShowModal(true)}
@@ -109,14 +111,14 @@ export default function GoalsPage() {
                                     marginTop: "1rem",
                                     padding: "0.8rem 1.5rem",
                                     background: "var(--surface)",
-                                    border: "1px solid #CBD5E0",
+                                    border: "1px solid var(--border)",
                                     borderRadius: "8px",
                                     fontWeight: "600",
                                     cursor: "pointer",
-                                    color: "#4A5568"
+                                    color: "var(--primary)"
                                 }}
                             >
-                                Criar Minha Primeira Meta
+                                {t('createFirstGoal')}
                             </button>
                         </div>
                     ) : (
