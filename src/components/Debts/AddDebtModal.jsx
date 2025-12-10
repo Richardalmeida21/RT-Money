@@ -99,31 +99,27 @@ export default function AddDebtModal({ onClose, onSave, editingDebt }) {
                             <span>Agendar Lembrete</span>
                         </div>
 
-                        <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.9rem", color: "#4A5568" }}>Enviar aviso 1 dia antes por:</label>
+                        <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.9rem", color: "#4A5568" }}>Enviar aviso 1 dia antes por Email:</label>
                         <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
                             <label style={{ display: "flex", alignItems: "center", gap: "0.3rem", cursor: "pointer" }}>
                                 <input type="radio" name="notif" value="none" checked={notificationMethod === 'none'} onChange={(e) => setNotificationMethod(e.target.value)} />
-                                Nenhum
+                                Não enviar
                             </label>
                             <label style={{ display: "flex", alignItems: "center", gap: "0.3rem", cursor: "pointer" }}>
                                 <input type="radio" name="notif" value="email" checked={notificationMethod === 'email'} onChange={(e) => setNotificationMethod(e.target.value)} />
-                                Email
-                            </label>
-                            <label style={{ display: "flex", alignItems: "center", gap: "0.3rem", cursor: "pointer" }}>
-                                <input type="radio" name="notif" value="sms" checked={notificationMethod === 'sms'} onChange={(e) => setNotificationMethod(e.target.value)} />
-                                SMS
+                                Sim, enviar Email
                             </label>
                         </div>
 
-                        {notificationMethod !== 'none' && (
+                        {notificationMethod === 'email' && (
                             <div>
                                 <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "#4A5568" }}>
-                                    {notificationMethod === 'email' ? "Email para aviso" : "Celular (com DDD)"}
+                                    Email para aviso
                                 </label>
                                 <input
-                                    type={notificationMethod === 'email' ? "email" : "tel"}
+                                    type="email"
                                     required
-                                    placeholder={notificationMethod === 'email' ? "seu@email.com" : "11999999999"}
+                                    placeholder="seu@email.com"
                                     value={contactInfo}
                                     onChange={(e) => setContactInfo(e.target.value)}
                                     style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid #CBD5E0" }}

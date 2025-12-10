@@ -1,6 +1,5 @@
 import admin from 'firebase-admin';
 import nodemailer from 'nodemailer';
-import twilio from 'twilio';
 
 // --- CONFIGURATION (Environment Variables from Vercel) ---
 // Note: In Vercel, you add these in Settings -> Environment Variables
@@ -28,12 +27,6 @@ if (!admin.apps.length) {
 const db = admin.apps.length ? admin.firestore() : null;
 
 export default async function handler(req, res) {
-    // Basic Security: Check for Vercel Cron header or a custom secret
-    // const authHeader = req.headers.authorization;
-    // if (req.headers['x-vercel-cron'] !== '1' && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    //     return res.status(401).json({ error: 'Unauthorized' });
-    // }
-
     if (!db) {
         return res.status(500).json({ error: 'Firebase not initialized. Check Env Vars.' });
     }
@@ -45,7 +38,6 @@ export default async function handler(req, res) {
     const tomorrowStr = tomorrow.toISOString().split('T')[0]; // YYYY-MM-DD
 
     let emailsSent = 0;
-    let smsSent = 0;
 
     try {
         // Configure Transports inside the request
@@ -56,8 +48,6 @@ export default async function handler(req, res) {
                 pass: process.env.EMAIL_PASS
             }
         });
-
-        const twilioClient = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
         const usersSnapshot = await db.collection("users").get();
 
@@ -74,7 +64,7 @@ export default async function handler(req, res) {
                 const debt = doc.data();
                 console.log(`🔔 Found debt: ${debt.title} for user ${userDoc.id}`);
 
-                if (debt.notificationMethod === 'email' || debt.notificationMethod === 'both') {
+                if (debt.notificationMethod === 'email') {
                     try {
                         await transporter.sendMail({
                             from: '"Financeiro App" <no-reply@financeiro.com>',
@@ -85,21 +75,10 @@ export default async function handler(req, res) {
                         emailsSent++;
                     } catch (e) { console.error("Email error:", e); }
                 }
-
-                if (debt.notificationMethod === 'sms' || debt.notificationMethod === 'both') {
-                    try {
-                        await twilioClient.messages.create({
-                            body: `Lembrete: Conta "${debt.title}" (R$ ${debt.amount}) vence amanha!`,
-                            from: process.env.TWILIO_PHONE,
-                            to: debt.contactInfo
-                        });
-                        smsSent++;
-                    } catch (e) { console.error("SMS error:", e); }
-                }
             }
         }
 
-        return res.status(200).json({ success: true, emailsSent, smsSent });
+        return res.status(200).json({ success: true, emailsSent });
 
     } catch (error) {
         console.error("Critical Worker Error:", error);
