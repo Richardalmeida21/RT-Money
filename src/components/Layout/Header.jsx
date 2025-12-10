@@ -14,7 +14,7 @@ export default function Header() {
             backgroundColor: "transparent"
         }}>
             <div>
-                <h1 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>Dashboard</h1>
+                <h1 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>Visão Geral</h1>
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
@@ -29,7 +29,7 @@ export default function Header() {
                     boxShadow: "var(--shadow)",
                     cursor: "pointer"
                 }}>
-                    <span>December</span>
+                    <span>Dezembro</span>
                     <ChevronDown size={16} />
                 </div>
 
@@ -45,7 +45,7 @@ export default function Header() {
                         </div>
                         <div style={{ display: "flex", flexDirection: "column" }}>
                             <span style={{ fontSize: "0.9rem", fontWeight: "600" }}>{user?.email?.split('@')[0]}</span>
-                            <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>User</span>
+                            <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Usuário</span>
                         </div>
                     </div>
                 </div>

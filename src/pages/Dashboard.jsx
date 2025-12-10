@@ -17,7 +17,7 @@ export default function Dashboard() {
         description: "",
         amount: "",
         type: "expense",
-        category: "Alimentação", // Default category in PT
+        category: "Alimentação",
         date: new Date().toISOString().split("T")[0]
     });
 
@@ -29,7 +29,6 @@ export default function Dashboard() {
         if (user) {
             try {
                 const data = await getTransactions(user.uid);
-                // Sort by date (newest first)
                 data.sort((a, b) => new Date(b.date) - new Date(a.date));
                 setTransactions(data);
             } catch (error) {
@@ -60,6 +59,7 @@ export default function Dashboard() {
         }
     };
 
+    // Logic to determine type if it's ambiguous, but now we rely on the 'type' field which is set correctly by Import or Manual Add
     const calculateBalance = () => {
         return transactions.reduce((acc, curr) => {
             return curr.type === "income" ? acc + curr.amount : acc - curr.amount;
@@ -73,11 +73,13 @@ export default function Dashboard() {
     const categoryData = transactions
         .filter(t => t.type === 'expense')
         .reduce((acc, curr) => {
-            const found = acc.find(item => item.name === curr.category);
+            // Use category if available, otherwise "Geral"
+            const catName = curr.category || "Geral";
+            const found = acc.find(item => item.name === catName);
             if (found) {
                 found.value += curr.amount;
             } else {
-                acc.push({ name: curr.category, value: curr.amount });
+                acc.push({ name: catName, value: curr.amount });
             }
             return acc;
         }, []);
@@ -138,8 +140,8 @@ export default function Dashboard() {
                         border: "2px dashed var(--primary-light)",
                         transition: "all 0.2s"
                     }}
-                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#F5F6FA"}
-                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = "white"}
+                    onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
+                    onMouseOut={(e) => e.currentTarget.style.transform = "translateY(0)"}
                 >
                     <div style={{ background: "#F3E8FF", padding: "1rem", borderRadius: "50%", marginBottom: "0.5rem" }}>
                         <UploadCloud size={24} color="#6200EE" />
@@ -185,73 +187,13 @@ export default function Dashboard() {
                 </div>
             </section>
 
-            {/* Main Content Split: Form and List */}
-            <section style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "1.5rem" }}>
-
-                {/* Add Transaction Form */}
-                <div style={{ background: "white", padding: "1.5rem", borderRadius: "16px", boxShadow: "var(--shadow)", height: "fit-content" }}>
-                    <h3 style={{ marginBottom: "1rem" }}>Nova Transação</h3>
-                    <form onSubmit={handleAddTransaction} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                        <input
-                            type="text"
-                            placeholder="Descrição"
-                            value={newTransaction.description}
-                            onChange={e => setNewTransaction({ ...newTransaction, description: e.target.value })}
-                            required
-                            style={{ padding: "0.8rem", borderRadius: "8px", border: "1px solid #ddd" }}
-                        />
-                        <input
-                            type="number"
-                            placeholder="Valor (R$)"
-                            step="0.01"
-                            value={newTransaction.amount}
-                            onChange={e => setNewTransaction({ ...newTransaction, amount: e.target.value })}
-                            required
-                            style={{ padding: "0.8rem", borderRadius: "8px", border: "1px solid #ddd" }}
-                        />
-                        <select
-                            value={newTransaction.type}
-                            onChange={e => setNewTransaction({ ...newTransaction, type: e.target.value })}
-                            style={{ padding: "0.8rem", borderRadius: "8px", border: "1px solid #ddd" }}
-                        >
-                            <option value="expense">Despesa</option>
-                            <option value="income">Receita</option>
-                        </select>
-                        <select
-                            value={newTransaction.category}
-                            onChange={e => setNewTransaction({ ...newTransaction, category: e.target.value })}
-                            style={{ padding: "0.8rem", borderRadius: "8px", border: "1px solid #ddd" }}
-                        >
-                            <option value="Alimentação">Alimentação</option>
-                            <option value="Transporte">Transporte</option>
-                            <option value="Moradia">Moradia</option>
-                            <option value="Saúde">Saúde</option>
-                            <option value="Lazer">Lazer</option>
-                            <option value="Salário">Salário</option>
-                            <option value="Investimentos">Investimentos</option>
-                            <option value="Compras">Compras</option>
-                            <option value="Geral">Geral</option>
-                        </select>
-                        <input
-                            type="date"
-                            value={newTransaction.date}
-                            onChange={e => setNewTransaction({ ...newTransaction, date: e.target.value })}
-                            required
-                            style={{ padding: "0.8rem", borderRadius: "8px", border: "1px solid #ddd" }}
-                        />
-                        <button type="submit" style={{ padding: "0.8rem", background: "var(--primary)", color: "white", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "bold", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
-                            <Plus size={20} /> Adicionar
-                        </button>
-                    </form>
-                </div>
-
-                {/* Transaction List */}
+            {/* Recent Transactions List (Mini) */}
+            <section>
                 <div style={{ background: "white", padding: "1.5rem", borderRadius: "16px", boxShadow: "var(--shadow)" }}>
-                    <h3 style={{ marginBottom: "1rem" }}>Transações Recentes</h3>
+                    <h3 style={{ marginBottom: "1rem" }}>Últimas Transações</h3>
                     {loading ? <p>Carregando...</p> : (
-                        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", maxHeight: "500px", overflowY: "auto" }}>
-                            {transactions.length === 0 && <p style={{ color: "#999" }}>Nenhuma transação encontrada.</p>}
-                            {transactions.map(t => (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", maxHeight: "300px", overflowY: "auto" }}>
+                            {transactions.slice(0, 5).map(t => (
                                 <div key={t.id} style={{
                                     display: "flex",
                                     alignItems: "center",
@@ -272,24 +214,19 @@ export default function Dashboard() {
                                         </div>
                                         <div>
                                             <p style={{ fontWeight: "600", marginBottom: "2px" }}>{t.description}</p>
-                                            <p style={{ fontSize: "0.8rem", color: "#666" }}>{t.category} • {new Date(t.date).toLocaleDateString('pt-BR')}</p>
+                                            <p style={{ fontSize: "0.8rem", color: "#666" }}>{t.date ? new Date(t.date).toLocaleDateString('pt-BR') : 'Data inválida'}</p>
                                         </div>
                                     </div>
 
-                                    <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-                                        <span style={{ fontWeight: "bold", color: t.type === "income" ? "#38A169" : "#E53E3E" }}>
-                                            {t.type === "income" ? "+" : "-"} R$ {Math.abs(t.amount).toFixed(2)}
-                                        </span>
-                                        <button onClick={() => handleDelete(t.id)} title="Excluir" style={{ background: "none", border: "none", cursor: "pointer", color: "#ccc" }}>
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
+                                    <span style={{ fontWeight: "bold", color: t.type === "income" ? "#38A169" : "#E53E3E" }}>
+                                        {t.type === "income" ? "+" : "-"} R$ {Math.abs(t.amount).toFixed(2)}
+                                    </span>
                                 </div>
                             ))}
+                            {transactions.length === 0 && <p style={{ color: "#999" }}>Nenhuma transação.</p>}
                         </div>
                     )}
                 </div>
-
             </section>
 
             {showImport && (

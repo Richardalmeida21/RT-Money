@@ -7,10 +7,10 @@ export default function Sidebar() {
     const { logout } = useAuth();
 
     const links = [
-        { icon: <LayoutDashboard size={20} />, label: "Dashboard", path: "/" },
-        { icon: <PieChart size={20} />, label: "Transactions", path: "/transactions" },
-        { icon: <Target size={20} />, label: "Goals", path: "/goals" },
-        { icon: <Settings size={20} />, label: "Settings", path: "/settings" },
+        { icon: <LayoutDashboard size={20} />, label: "Visão Geral", path: "/" },
+        { icon: <PieChart size={20} />, label: "Transações", path: "/transactions" },
+        { icon: <Target size={20} />, label: "Metas", path: "/goals" },
+        { icon: <Settings size={20} />, label: "Configurações", path: "/settings" },
     ];
 
     return (
@@ -73,7 +73,7 @@ export default function Sidebar() {
                 }}
             >
                 <LogOut size={20} />
-                Logout
+                Sair
             </button>
         </aside>
     );

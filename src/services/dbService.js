@@ -29,8 +29,7 @@ export const getTransactions = async (userId) => {
     try {
         const q = query(
             collection(db, "users", userId, "transactions"),
-            orderBy("date", "desc"),
-            orderBy("createdAt", "desc")
+            orderBy("date", "desc")
         );
 
         const querySnapshot = await getDocs(q);

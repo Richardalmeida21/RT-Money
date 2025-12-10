@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Upload, X, Check } from "lucide-react";
-import { parseOFX } from "../../utils/ofxParser";
+import { parseFile } from "../../utils/parsers/index";
 import { categorizeTransaction } from "../../utils/categorizer";
 import { addTransaction } from "../../services/dbService";
 import { useAuth } from "../../context/AuthContext";
@@ -11,12 +11,31 @@ export default function ImportTransactions({ onClose, onImportComplete }) {
     const [previewData, setPreviewData] = useState([]);
     const [importing, setImporting] = useState(false);
 
+    const [debugInfo, setDebugInfo] = useState("");
+    const [processing, setProcessing] = useState(false);
+
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
         if (selectedFile) {
+            setProcessing(true);
             setFile(selectedFile);
+            setDebugInfo("");
             try {
-                const parsed = await parseOFX(selectedFile);
+                // Determine reading method for debug based on type
+                // Text for OFX, binary/NA for others
+                let textDebug = "";
+                if (selectedFile.name.toLowerCase().endsWith('.ofx') || selectedFile.name.toLowerCase().endsWith('.xml')) {
+                    textDebug = await selectedFile.text();
+                }
+
+                const parsed = await parseFile(selectedFile); // Use factory
+
+                if (parsed.length === 0) {
+                    if (textDebug) setDebugInfo(textDebug.substring(0, 600));
+                    alert("Nenhuma transação encontrada. O formato do arquivo pode não ser compatível.");
+                    setProcessing(false);
+                    return;
+                }
 
                 // Apply "Provisional AI" Categorization
                 const enriched = parsed.map(t => ({
@@ -26,7 +45,11 @@ export default function ImportTransactions({ onClose, onImportComplete }) {
 
                 setPreviewData(enriched);
             } catch (error) {
-                alert("Erro ao ler arquivo. Verifique se é um OFX válido.");
+                console.error(error);
+                setDebugInfo(`Erro Técnico: ${error.message}\n\nStack: ${error.stack}`);
+                alert("Erro ao ler arquivo. Veja os detalhes abaixo.");
+            } finally {
+                setProcessing(false);
             }
         }
     };
@@ -71,12 +94,39 @@ export default function ImportTransactions({ onClose, onImportComplete }) {
                     <div style={{ border: "2px dashed #ccc", padding: "3rem", borderRadius: "12px", textAlign: "center" }}>
                         <Upload size={48} color="#ccc" />
                         <p style={{ marginTop: "1rem" }}>Arraste seu arquivo OFX aqui ou clique para selecionar</p>
-                        <input
-                            type="file"
-                            accept=".ofx,.xml"
-                            onChange={handleFileChange}
-                            style={{ marginTop: "1rem" }}
-                        />
+                        {processing ? (
+                            <p style={{ marginTop: "1rem", color: "var(--primary)", fontWeight: "bold" }}>Lendo arquivo...</p>
+                        ) : (
+                            <input
+                                type="file"
+                                accept=".ofx,.xml,.xlsx,.xls,.csv,.pdf"
+                                onChange={handleFileChange}
+                                style={{ marginTop: "1rem" }}
+                            />
+                        )}
+
+                        {debugInfo && (
+                            <div style={{ marginTop: "2rem", textAlign: "left" }}>
+                                <p style={{ fontWeight: "bold", marginBottom: "0.5rem", color: "#666" }}>Detalhes do Arquivo (Debug):</p>
+                                <textarea
+                                    readOnly
+                                    value={debugInfo}
+                                    style={{
+                                        width: "100%",
+                                        height: "150px",
+                                        fontFamily: "monospace",
+                                        fontSize: "0.8rem",
+                                        padding: "1rem",
+                                        borderRadius: "8px",
+                                        border: "1px solid #ccc",
+                                        background: "#f9f9f9"
+                                    }}
+                                />
+                                <p style={{ fontSize: "0.8rem", color: "#666", marginTop: "0.5rem" }}>
+                                    Tire um print ou copie o texto acima para eu ajustar o leitor de arquivos.
+                                </p>
+                            </div>
+                        )}
                     </div>
                 ) : (
                     <div>
@@ -93,7 +143,7 @@ export default function ImportTransactions({ onClose, onImportComplete }) {
                                 <tbody>
                                     {previewData.map((t, i) => (
                                         <tr key={i} style={{ borderBottom: "1px solid #eee" }}>
-                                            <td style={{ padding: "0.5rem" }}>{new Date(t.date).toLocaleDateString('pt-BR')}</td>
+                                            <td style={{ padding: "0.5rem" }}>{t.date.split('-').reverse().join('/')}</td>
                                             <td style={{ padding: "0.5rem" }}>{t.description}</td>
                                             <td style={{ padding: "0.5rem" }}>
                                                 <span style={{ background: "#E8F0FE", color: "#1967D2", padding: "2px 8px", borderRadius: "12px", fontSize: "0.8rem" }}>
