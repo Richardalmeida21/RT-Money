@@ -1,0 +1,80 @@
+import { Home, LayoutDashboard, Target, PieChart, Settings, LogOut } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+
+export default function Sidebar() {
+    const { pathname } = useLocation();
+    const { logout } = useAuth();
+
+    const links = [
+        { icon: <LayoutDashboard size={20} />, label: "Dashboard", path: "/" },
+        { icon: <PieChart size={20} />, label: "Transactions", path: "/transactions" },
+        { icon: <Target size={20} />, label: "Goals", path: "/goals" },
+        { icon: <Settings size={20} />, label: "Settings", path: "/settings" },
+    ];
+
+    return (
+        <aside style={{
+            width: "250px",
+            height: "100vh",
+            backgroundColor: "var(--surface)",
+            borderRight: "1px solid var(--border)",
+            display: "flex",
+            flexDirection: "column",
+            padding: "2rem",
+            position: "fixed",
+            left: 0,
+            top: 0
+        }}>
+            <div style={{ marginBottom: "3rem", display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--primary)" }}>
+                <div style={{ padding: "0.5rem", background: "var(--primary)", borderRadius: "8px" }}>
+                    <Home color="white" size={24} />
+                </div>
+                <h2 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>RT Money</h2>
+            </div>
+
+            <nav style={{ display: "flex", flexDirection: "column", gap: "0.5rem", flex: 1 }}>
+                {links.map((link) => (
+                    <Link
+                        key={link.path}
+                        to={link.path}
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "1rem",
+                            padding: "1rem",
+                            borderRadius: "12px",
+                            color: pathname === link.path ? "var(--primary)" : "var(--text-secondary)",
+                            backgroundColor: pathname === link.path ? "rgba(98, 0, 238, 0.1)" : "transparent",
+                            fontWeight: pathname === link.path ? "600" : "400",
+                            transition: "all 0.2s"
+                        }}
+                    >
+                        {link.icon}
+                        {link.label}
+                    </Link>
+                ))}
+            </nav>
+
+            <button
+                onClick={logout}
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1rem",
+                    padding: "1rem",
+                    borderRadius: "12px",
+                    color: "var(--error)",
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    marginTop: "auto",
+                    fontSize: "1rem"
+                }}
+            >
+                <LogOut size={20} />
+                Logout
+            </button>
+        </aside>
+    );
+}
