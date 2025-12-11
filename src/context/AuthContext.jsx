@@ -7,7 +7,7 @@ import {
     GoogleAuthProvider,
     signInWithPopup
 } from "firebase/auth";
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import { auth, db } from "../services/firebase";
 
 const AuthContext = createContext();
@@ -56,17 +56,29 @@ export function AuthProvider({ children }) {
         return signInWithEmailAndPassword(auth, email, password);
     };
 
-    const register = (email, password) => {
-        return createUserWithEmailAndPassword(auth, email, password);
+    const register = async (email, password) => {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        // Create official user document to prevent ghost users for cron jobs
+        await setDoc(doc(db, "users", userCredential.user.uid), {
+            email: email,
+            createdAt: new Date().toISOString()
+        }, { merge: true });
+        return userCredential;
     };
 
     const logout = () => {
         return signOut(auth);
     };
 
-    const loginWithGoogle = () => {
+    const loginWithGoogle = async () => {
         const provider = new GoogleAuthProvider();
-        return signInWithPopup(auth, provider);
+        const userCredential = await signInWithPopup(auth, provider);
+        // Ensure official user document exists
+        await setDoc(doc(db, "users", userCredential.user.uid), {
+            email: userCredential.user.email,
+            lastLogin: new Date().toISOString()
+        }, { merge: true });
+        return userCredential;
     };
 
     const value = {
