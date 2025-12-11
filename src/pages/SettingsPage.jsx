@@ -346,22 +346,22 @@ export default function SettingsPage() {
                                             {installPrompt ? "Instalar Agora" : (showManualInstall ? "Ocultar Instruções" : "Baixar App")}
                                         </button>
 
-                                        {/* Inline Instructions (No Pop-up) */}
-                                        {showManualInstall && !installPrompt && (
-                                            <div style={{ marginTop: "1.5rem", textAlign: "left", background: "var(--background)", padding: "1rem", borderRadius: "8px", border: "1px dashed var(--border)", animation: "fadeIn 0.3s ease" }}>
-                                                <p style={{ color: "var(--text-primary)", fontWeight: "600", marginBottom: "0.5rem", fontSize: "0.9rem" }}>
-                                                    Como instalar manualmente:
-                                                </p>
-                                                <ul style={{ paddingLeft: "1.2rem", margin: 0, color: "var(--text-secondary)", fontSize: "0.85rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                                                    <li>
-                                                        <strong>Android / PC:</strong> Abra o menu do navegador (⋮) e clique em <em>"Instalar Aplicativo"</em> ou <em>"Adicionar à Tela Inicial"</em>.
-                                                    </li>
-                                                    <li>
-                                                        <strong>iOS:</strong> Toque no botão <em>Compartilhar</em> e selecione <em>"Adicionar à Tela de Início"</em>.
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        )}
+                                        <div style={{ marginTop: "1.5rem", textAlign: "left", background: "var(--background)", padding: "1rem", borderRadius: "8px", border: "1px dashed var(--border)", animation: "fadeIn 0.3s ease" }}>
+                                            <p style={{ color: "var(--text-primary)", fontWeight: "600", marginBottom: "0.5rem", fontSize: "0.9rem" }}>
+                                                Como instalar manualmente:
+                                            </p>
+                                            <ul style={{ paddingLeft: "1.2rem", margin: 0, color: "var(--text-secondary)", fontSize: "0.85rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                                                <li>
+                                                    <strong>Android / PC:</strong> Abra o menu do navegador (⋮) e clique em <em>"Instalar Aplicativo"</em> ou <em>"Adicionar à Tela Inicial"</em>.
+                                                </li>
+                                                <li>
+                                                    <strong>iOS:</strong> Toque no botão <em>Compartilhar</em> e selecione <em>"Adicionar à Tela de Início"</em>.
+                                                </li>
+                                                <li style={{ marginTop: "0.5rem", color: "var(--primary)", fontWeight: "500" }}>
+                                                    <strong>Já instalado?</strong> Verifique se aparece um ícone "Abrir no App" na sua barra de endereços acima.
+                                                </li>
+                                            </ul>
+                                        </div>
 
                                         {!installPrompt && !showManualInstall && (
                                             <p style={{ marginTop: "1rem", fontSize: "0.8rem", color: "var(--text-secondary)", opacity: 0.8 }}>
