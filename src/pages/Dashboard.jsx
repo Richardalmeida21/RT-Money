@@ -172,6 +172,7 @@ export default function Dashboard() {
                                 contentStyle={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text-primary)', borderRadius: '12px' }}
                                 itemStyle={{ color: 'var(--text-primary)' }}
                                 labelStyle={{ color: 'var(--text-secondary)' }}
+                                formatter={(value) => `R$ ${value.toFixed(2)}`}
                             />
                             <Bar dataKey="value" radius={[10, 10, 0, 0]}>
                                 {monthlyData.map((entry, index) => (
@@ -192,7 +193,11 @@ export default function Dashboard() {
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>
-                            <Tooltip />
+                            <Tooltip
+                                contentStyle={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text-primary)', borderRadius: '12px' }}
+                                itemStyle={{ color: 'var(--text-primary)' }}
+                                formatter={(value) => `R$ ${value.toFixed(2)}`}
+                            />
                             <Legend />
                         </PieChart>
                     </ResponsiveContainer>
