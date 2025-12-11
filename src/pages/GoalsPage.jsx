@@ -4,6 +4,7 @@ import { addGoal, getGoals, updateGoal, deleteGoal } from "../services/dbService
 import Layout from "../components/Layout/Layout";
 import GoalCard from "../components/Goals/GoalCard";
 import AddGoalModal from "../components/Goals/AddGoalModal";
+import GoalContributionModal from "../components/Goals/GoalContributionModal";
 import { Plus, Target } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 
@@ -14,6 +15,7 @@ export default function GoalsPage() {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingGoal, setEditingGoal] = useState(null);
+    const [contributionGoal, setContributionGoal] = useState(null);
 
     useEffect(() => {
         fetchGoals();
@@ -49,17 +51,19 @@ export default function GoalsPage() {
         }
     };
 
-    const handleAddMoney = async (goal) => {
-        const amountStr = prompt(`${t('addMoneyPrompt')} "${goal.title}"?`, "0.00");
-        if (amountStr) {
-            const amount = parseFloat(amountStr.replace(',', '.'));
-            if (!isNaN(amount) && amount > 0) {
-                await updateGoal(user.uid, goal.id, {
-                    currentAmount: (goal.currentAmount || 0) + amount
-                });
-                fetchGoals();
-            }
+    const handleAddMoney = async (goal, customAmount = null) => {
+        // If coming from card click, just open modal
+        if (!customAmount) {
+            setContributionGoal(goal);
+            return;
         }
+
+        // If coming from modal confirmation
+        await updateGoal(user.uid, goal.id, {
+            currentAmount: (goal.currentAmount || 0) + customAmount
+        });
+        fetchGoals();
+        setContributionGoal(null);
     };
 
     return (
@@ -142,6 +146,14 @@ export default function GoalsPage() {
                     onClose={() => { setShowModal(false); setEditingGoal(null); }}
                     onSave={handleSaveGoal}
                     editingGoal={editingGoal}
+                />
+            )}
+
+            {contributionGoal && (
+                <GoalContributionModal
+                    goal={contributionGoal}
+                    onClose={() => setContributionGoal(null)}
+                    onConfirm={(amount) => handleAddMoney(contributionGoal, amount)}
                 />
             )}
         </Layout>
