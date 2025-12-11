@@ -13,7 +13,7 @@ export default function SettingsPage() {
     const { user } = useAuth();
     const { language, setLanguage, t } = useLanguage();
     const { theme, toggleTheme } = useTheme();
-    const { installPrompt, promptInstall, isInstalled, resetInstallation } = useInstallation();
+    const { installPrompt, promptInstall, isInstalled, resetInstallation, confirmInstallation } = useInstallation();
 
     // Profile State
     const [displayName, setDisplayName] = useState("");
@@ -363,8 +363,8 @@ export default function SettingsPage() {
                                                 <li>
                                                     <strong>iOS:</strong> Toque no botão <em>Compartilhar</em> e selecione <em>"Adicionar à Tela de Início"</em>.
                                                 </li>
-                                                <li style={{ marginTop: "0.5rem", color: "var(--primary)", fontWeight: "500" }}>
-                                                    <strong>Já instalado?</strong> Verifique se aparece um ícone "Abrir no App" na sua barra de endereços acima.
+                                                <li style={{ marginTop: "0.5rem", color: "var(--primary)", fontWeight: "500", cursor: "pointer" }} onClick={confirmInstallation}>
+                                                    <strong>Já instalado?</strong> Clique aqui para confirmar e remover este aviso.
                                                 </li>
                                             </ul>
                                         </div>

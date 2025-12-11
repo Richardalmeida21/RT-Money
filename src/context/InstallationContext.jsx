@@ -61,8 +61,13 @@ export function InstallationProvider({ children }) {
         setIsInstalled(false);
     };
 
+    const confirmInstallation = () => {
+        localStorage.setItem('pwaInstalled', 'true');
+        setIsInstalled(true);
+    };
+
     return (
-        <InstallationContext.Provider value={{ installPrompt, promptInstall, isInstalled, resetInstallation }}>
+        <InstallationContext.Provider value={{ installPrompt, promptInstall, isInstalled, resetInstallation, confirmInstallation }}>
             {children}
         </InstallationContext.Provider>
     );
