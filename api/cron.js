@@ -66,11 +66,49 @@ export default async function handler(req, res) {
 
                 if (debt.notificationMethod === 'email') {
                     try {
+                        // Format date to DD/MM/YYYY
+                        const [year, month, day] = debt.dueDate.split('-');
+                        const formattedDate = `${day}/${month}/${year}`;
+
+                        // Get user name or default
+                        const userName = userDoc.data().displayName || "Usuário";
+
+                        const htmlContent = `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0;">
+                            <div style="background-color: #6B46C1; padding: 20px; text-align: center;">
+                                <h1 style="color: #ffffff; margin: 0; font-size: 24px;">RT Money</h1>
+                            </div>
+                            <div style="padding: 30px; color: #334155;">
+                                <h2 style="color: #1e293b; margin-top: 0;">Olá, ${userName}! 👋</h2>
+                                <p style="font-size: 16px; line-height: 1.6;">
+                                    Você tem uma conta vencendo amanhã. Não esqueça de se organizar!
+                                </p>
+                                
+                                <div style="background-color: #F3F4F6; padding: 20px; border-radius: 12px; margin: 20px 0;">
+                                    <h3 style="margin: 0 0 10px 0; color: #6B46C1; font-size: 18px;">${debt.title}</h3>
+                                    <p style="margin: 5px 0; font-size: 16px;"><strong>Valor:</strong> R$ ${debt.amount}</p>
+                                    <p style="margin: 5px 0; font-size: 16px;"><strong>Vencimento:</strong> ${formattedDate}</p>
+                                </div>
+
+                                <div style="text-align: center; margin-top: 30px;">
+                                    <a href="https://rt-money.vercel.app" style="background-color: #6B46C1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                                        Marcar como Pago
+                                    </a>
+                                </div>
+                            </div>
+                            <div style="background-color: #f8fafc; padding: 15px; text-align: center; font-size: 12px; color: #94a3b8;">
+                                <p>Este é um aviso automático do RT Money 🚀</p>
+                                <p style="margin-top: 5px;">Por favor, não responda este email.</p>
+                            </div>
+                        </div>
+                        `;
+
                         await transporter.sendMail({
-                            from: '"Financeiro App" <no-reply@financeiro.com>',
+                            from: '"RT Money" <no-reply@rt-money.app>',
                             to: debt.contactInfo,
-                            subject: `Lembrete: Pagamento de ${debt.title} vence amanhã!`,
-                            text: `Olá! Não esqueça de pagar sua conta "${debt.title}" no valor de R$ ${debt.amount} que vence amanhã (${debt.dueDate}).`
+                            subject: `🔔 Lembrete: ${debt.title} vence amanhã!`,
+                            text: `Olá ${userName}, sua conta ${debt.title} de R$ ${debt.amount} vence em ${formattedDate}. Acesse o app para pagar.`,
+                            html: htmlContent
                         });
                         emailsSent++;
                     } catch (e) { console.error("Email error:", e); }

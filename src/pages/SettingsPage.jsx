@@ -122,6 +122,8 @@ export default function SettingsPage() {
         try {
             if (displayName !== user.displayName) {
                 await updateProfile(user, { displayName });
+                // Also save to Firestore so Cron Job can read it
+                await setDoc(doc(db, "users", user.uid), { displayName }, { merge: true });
                 setMessage({ type: "success", text: t('profileUpdated') });
             }
 
