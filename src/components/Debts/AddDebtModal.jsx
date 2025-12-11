@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { X, Bell } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 export default function AddDebtModal({ onClose, onSave, editingDebt }) {
+    const { user } = useAuth();
     const [title, setTitle] = useState("");
     const [amount, setAmount] = useState("");
     const [dueDate, setDueDate] = useState("");
@@ -9,15 +11,33 @@ export default function AddDebtModal({ onClose, onSave, editingDebt }) {
     const [contactInfo, setContactInfo] = useState(""); // email or phone
     const [loading, setLoading] = useState(false);
 
+    // Toggle for custom email
+    const [useCustomEmail, setUseCustomEmail] = useState(false);
+
     useEffect(() => {
         if (editingDebt) {
             setTitle(editingDebt.title);
             setAmount(editingDebt.amount);
             setDueDate(editingDebt.dueDate);
             setNotificationMethod(editingDebt.notificationMethod || "none");
-            setContactInfo(editingDebt.contactInfo || "");
+
+            const savedEmail = editingDebt.contactInfo || "";
+            setContactInfo(savedEmail);
+
+            // If saved email is different from user email, it's a custom one
+            if (savedEmail && user?.email && savedEmail !== user.email) {
+                setUseCustomEmail(true);
+            } else {
+                setUseCustomEmail(false);
+            }
+        } else {
+            // New debt: Default to user email if available
+            if (user?.email) {
+                setContactInfo(user.email);
+            }
+            setUseCustomEmail(false);
         }
-    }, [editingDebt]);
+    }, [editingDebt, user]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -122,8 +142,33 @@ export default function AddDebtModal({ onClose, onSave, editingDebt }) {
                                     placeholder="seu@email.com"
                                     value={contactInfo}
                                     onChange={(e) => setContactInfo(e.target.value)}
-                                    style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid var(--border)", background: "var(--background)", color: "var(--text-primary)" }}
+                                    readOnly={!useCustomEmail}
+                                    style={{
+                                        width: "100%", padding: "0.8rem", borderRadius: "8px",
+                                        border: "1px solid var(--border)",
+                                        background: useCustomEmail ? "var(--background)" : "var(--surface)",
+                                        color: useCustomEmail ? "var(--text-primary)" : "var(--text-secondary)",
+                                        cursor: useCustomEmail ? "text" : "not-allowed",
+                                        opacity: useCustomEmail ? 1 : 0.8
+                                    }}
                                 />
+                                <div style={{ marginTop: "0.8rem" }}>
+                                    <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem", color: "var(--text-secondary)", cursor: "pointer" }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={useCustomEmail}
+                                            onChange={(e) => {
+                                                const isChecked = e.target.checked;
+                                                setUseCustomEmail(isChecked);
+                                                if (!isChecked && user?.email) {
+                                                    setContactInfo(user.email);
+                                                }
+                                            }}
+                                            style={{ cursor: "pointer" }}
+                                        />
+                                        Usar outro e-mail
+                                    </label>
+                                </div>
                             </div>
                         )}
                     </div>
