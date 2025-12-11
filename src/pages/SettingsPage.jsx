@@ -38,6 +38,9 @@ export default function SettingsPage() {
 
     const [imgError, setImgError] = useState(false);
 
+    // Manual install instructions toggle
+    const [showManualInstall, setShowManualInstall] = useState(false);
+
 
     // Reset error when photoURL changes
     useEffect(() => {
@@ -318,32 +321,60 @@ export default function SettingsPage() {
                                 </div>
                             ) : (
                                 <>
-                                    {installPrompt ? (
-                                        <div style={{ background: "rgba(99, 102, 241, 0.05)", padding: "1.5rem", borderRadius: "12px", textAlign: "center" }}>
-                                            <p style={{ marginBottom: "1.5rem", color: "var(--text-secondary)", fontSize: "0.95rem" }}>
-                                                Instale o aplicativo para uma melhor experiência.
-                                            </p>
+                                    <div style={{ background: "rgba(99, 102, 241, 0.05)", padding: "1.5rem", borderRadius: "12px", textAlign: "center" }}>
+                                        <p style={{ marginBottom: "1.5rem", color: "var(--text-secondary)", fontSize: "0.95rem" }}>
+                                            Instale o aplicativo para uma melhor experiência.
+                                        </p>
 
-                                            <button
-                                                onClick={promptInstall}
-                                                style={{
-                                                    width: "100%", padding: "0.9rem", background: "#4F46E5", color: "white",
-                                                    border: "none", borderRadius: "10px", fontWeight: "600", cursor: "pointer",
-                                                    display: "flex", alignItems: "center", justifyContent: "center", gap: "0.6rem",
-                                                    fontSize: "1rem", boxShadow: "0 4px 6px -1px rgba(79, 70, 229, 0.2)"
-                                                }}
-                                            >
-                                                <Download size={20} />
-                                                Instalar Agora
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <div style={{ padding: "0.5rem", textAlign: "center", opacity: 0.7 }}>
-                                            <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-                                                Para instalar, use a opção "Instalar Aplicativo"<br />no menu do seu navegador.
+                                        <button
+                                            onClick={() => {
+                                                if (installPrompt) {
+                                                    promptInstall();
+                                                    setShowManualInstall(false);
+                                                } else {
+                                                    setShowManualInstall(!showManualInstall);
+                                                }
+                                            }}
+                                            style={{
+                                                width: "100%", padding: "0.9rem", background: "#4F46E5", color: "white",
+                                                border: "none", borderRadius: "10px", fontWeight: "600", cursor: "pointer",
+                                                display: "flex", alignItems: "center", justifyContent: "center", gap: "0.6rem",
+                                                fontSize: "1rem", boxShadow: "0 4px 6px -1px rgba(79, 70, 229, 0.2)"
+                                            }}
+                                        >
+                                            <Download size={20} />
+                                            {installPrompt ? "Instalar Agora" : (showManualInstall ? "Ocultar Instruções" : "Baixar App")}
+                                        </button>
+
+                                        {/* Inline Instructions (No Pop-up) */}
+                                        {showManualInstall && !installPrompt && (
+                                            <div style={{ marginTop: "1.5rem", textAlign: "left", background: "var(--background)", padding: "1rem", borderRadius: "8px", border: "1px dashed var(--border)", animation: "fadeIn 0.3s ease" }}>
+                                                <p style={{ color: "var(--text-primary)", fontWeight: "600", marginBottom: "0.5rem", fontSize: "0.9rem" }}>
+                                                    Como instalar manualmente:
+                                                </p>
+                                                <ul style={{ paddingLeft: "1.2rem", margin: 0, color: "var(--text-secondary)", fontSize: "0.85rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                                                    <li>
+                                                        <strong>Android / PC:</strong> Abra o menu do navegador (⋮) e clique em <em>"Instalar Aplicativo"</em> ou <em>"Adicionar à Tela Inicial"</em>.
+                                                    </li>
+                                                    <li>
+                                                        <strong>iOS:</strong> Toque no botão <em>Compartilhar</em> e selecione <em>"Adicionar à Tela de Início"</em>.
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        )}
+
+                                        {!installPrompt && !showManualInstall && (
+                                            <p style={{ marginTop: "1rem", fontSize: "0.8rem", color: "var(--text-secondary)", opacity: 0.8 }}>
+                                                *Se o download não iniciar, clique acima para ver como instalar.
                                             </p>
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
+                                    <style>{`
+                                        @keyframes fadeIn {
+                                            from { opacity: 0; transform: translateY(-10px); }
+                                            to { opacity: 1; transform: translateY(0); }
+                                        }
+                                    `}</style>
                                 </>
                             )}
                         </div>
