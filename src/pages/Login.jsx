@@ -294,7 +294,7 @@ export default function Login() {
                             alignItems: "center",
                             justifyContent: "center",
                             gap: "0.8rem",
-                            marginBottom: "1.5rem",
+                            marginBottom: "1rem",
                             transition: "all 0.2s",
                             boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)"
                         }}
@@ -304,6 +304,8 @@ export default function Login() {
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: "20px", height: "20px" }} />
                         Entrar com Google
                     </button>
+
+
 
                     <div style={{ display: "flex", alignItems: "center", margin: "1.5rem 0" }}>
                         <div style={{ flex: 1, height: "1px", backgroundColor: "#E2E8F0" }}></div>

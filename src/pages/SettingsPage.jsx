@@ -6,12 +6,14 @@ import Layout from "../components/Layout/Layout";
 import { updatePassword, updateProfile, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import { db } from "../services/firebase";
-import { Camera, Lock, User as UserIcon, Moon, Sun, Monitor } from "lucide-react";
+import { Camera, Lock, User as UserIcon, Moon, Sun, Monitor, Download, Smartphone } from "lucide-react";
+import { useInstallation } from "../context/InstallationContext";
 
 export default function SettingsPage() {
     const { user } = useAuth();
     const { language, setLanguage, t } = useLanguage();
     const { theme, toggleTheme } = useTheme();
+    const { installPrompt, promptInstall, isInstalled } = useInstallation();
 
     // Profile State
     const [displayName, setDisplayName] = useState("");
@@ -35,6 +37,7 @@ export default function SettingsPage() {
     const [message, setMessage] = useState({ type: "", text: "" });
 
     const [imgError, setImgError] = useState(false);
+
 
     // Reset error when photoURL changes
     useEffect(() => {
@@ -300,9 +303,53 @@ export default function SettingsPage() {
                                 </button>
                             </div>
                         </div>
+
+                        {/* App Installation */}
+                        <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1.5rem" }}>
+                            <h3 style={{ fontSize: "1rem", fontWeight: "600", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--text-primary)" }}>
+                                <Smartphone size={18} /> Instalação do App
+                            </h3>
+
+                            {isInstalled ? (
+                                <div style={{ background: "rgba(16, 185, 129, 0.1)", padding: "1rem", borderRadius: "12px", textAlign: "center" }}>
+                                    <p style={{ color: "#059669", fontWeight: "600", fontSize: "0.9rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
+                                        <Smartphone size={18} /> App Instalado
+                                    </p>
+                                </div>
+                            ) : (
+                                <>
+                                    {installPrompt ? (
+                                        <div style={{ background: "rgba(99, 102, 241, 0.05)", padding: "1.5rem", borderRadius: "12px", textAlign: "center" }}>
+                                            <p style={{ marginBottom: "1.5rem", color: "var(--text-secondary)", fontSize: "0.95rem" }}>
+                                                Instale o aplicativo para uma melhor experiência.
+                                            </p>
+
+                                            <button
+                                                onClick={promptInstall}
+                                                style={{
+                                                    width: "100%", padding: "0.9rem", background: "#4F46E5", color: "white",
+                                                    border: "none", borderRadius: "10px", fontWeight: "600", cursor: "pointer",
+                                                    display: "flex", alignItems: "center", justifyContent: "center", gap: "0.6rem",
+                                                    fontSize: "1rem", boxShadow: "0 4px 6px -1px rgba(79, 70, 229, 0.2)"
+                                                }}
+                                            >
+                                                <Download size={20} />
+                                                Instalar Agora
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div style={{ padding: "0.5rem", textAlign: "center", opacity: 0.7 }}>
+                                            <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+                                                Para instalar, use a opção "Instalar Aplicativo"<br />no menu do seu navegador.
+                                            </p>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
-        </Layout>
+        </Layout >
     );
 }
