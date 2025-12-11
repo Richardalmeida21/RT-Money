@@ -13,7 +13,7 @@ export default function SettingsPage() {
     const { user } = useAuth();
     const { language, setLanguage, t } = useLanguage();
     const { theme, toggleTheme } = useTheme();
-    const { installPrompt, promptInstall, isInstalled } = useInstallation();
+    const { installPrompt, promptInstall, isInstalled, resetInstallation } = useInstallation();
 
     // Profile State
     const [displayName, setDisplayName] = useState("");
@@ -318,6 +318,12 @@ export default function SettingsPage() {
                                     <p style={{ color: "#059669", fontWeight: "600", fontSize: "0.9rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
                                         <Smartphone size={18} /> App Instalado
                                     </p>
+                                    <button
+                                        onClick={resetInstallation}
+                                        style={{ marginTop: "0.5rem", background: "none", border: "none", color: "var(--text-secondary)", fontSize: "0.75rem", textDecoration: "underline", cursor: "pointer", opacity: 0.7 }}
+                                    >
+                                        Não está instalado?
+                                    </button>
                                 </div>
                             ) : (
                                 <>

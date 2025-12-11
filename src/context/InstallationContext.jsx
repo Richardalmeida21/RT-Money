@@ -23,13 +23,17 @@ export function InstallationProvider({ children }) {
             console.log("App was installed");
             setInstallPrompt(null);
             setIsInstalled(true);
+            localStorage.setItem('pwaInstalled', 'true');
         };
 
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
         window.addEventListener('appinstalled', handleAppInstalled);
 
-        // Check if already in standalone mode
-        if (window.matchMedia('(display-mode: standalone)').matches) {
+        // Check if already in standalone mode OR if previously installed
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+        const storedInstalled = localStorage.getItem('pwaInstalled') === 'true';
+
+        if (isStandalone || storedInstalled) {
             setIsInstalled(true);
         }
 
@@ -47,11 +51,18 @@ export function InstallationProvider({ children }) {
         const { outcome } = await installPrompt.userChoice;
         console.log(`User response to the install prompt: ${outcome}`);
 
-        setInstallPrompt(null);
+        if (outcome === 'accepted') {
+            setInstallPrompt(null);
+        }
+    };
+
+    const resetInstallation = () => {
+        localStorage.removeItem('pwaInstalled');
+        setIsInstalled(false);
     };
 
     return (
-        <InstallationContext.Provider value={{ installPrompt, promptInstall, isInstalled }}>
+        <InstallationContext.Provider value={{ installPrompt, promptInstall, isInstalled, resetInstallation }}>
             {children}
         </InstallationContext.Provider>
     );
