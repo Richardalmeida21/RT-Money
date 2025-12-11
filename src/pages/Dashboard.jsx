@@ -112,7 +112,7 @@ export default function Dashboard() {
                 <div style={{ background: "var(--surface)", padding: "1.5rem", borderRadius: "16px", boxShadow: "var(--shadow)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
                         <span style={{ color: "var(--text-secondary)" }}>{t('currentBalance')}</span>
-                        <div style={{ background: "#E8F0FE", padding: "8px", borderRadius: "50%" }}>
+                        <div style={{ background: "#E8F0FE", width: "40px", height: "40px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <Wallet size={20} color="#1967D2" />
                         </div>
                     </div>
@@ -122,7 +122,7 @@ export default function Dashboard() {
                 <div style={{ background: "var(--surface)", padding: "1.5rem", borderRadius: "16px", boxShadow: "var(--shadow)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
                         <span style={{ color: "var(--text-secondary)" }}>{t('income')}</span>
-                        <div style={{ background: "#E6FFFA", padding: "8px", borderRadius: "50%" }}>
+                        <div style={{ background: "#E6FFFA", width: "40px", height: "40px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <ArrowUpCircle size={20} color="#38A169" />
                         </div>
                     </div>
@@ -132,7 +132,7 @@ export default function Dashboard() {
                 <div style={{ background: "var(--surface)", padding: "1.5rem", borderRadius: "16px", boxShadow: "var(--shadow)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
                         <span style={{ color: "var(--text-secondary)" }}>{t('expenses')}</span>
-                        <div style={{ background: "#FFF5F5", padding: "8px", borderRadius: "50%" }}>
+                        <div style={{ background: "#FFF5F5", width: "40px", height: "40px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <ArrowDownCircle size={20} color="#E53E3E" />
                         </div>
                     </div>
@@ -143,7 +143,7 @@ export default function Dashboard() {
                 <div style={{ background: "var(--surface)", padding: "1.5rem", borderRadius: "16px", boxShadow: "var(--shadow)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
                         <span style={{ color: "var(--text-secondary)" }}>{t('periodBalance')}</span>
-                        <div style={{ background: "#F3E8FF", padding: "8px", borderRadius: "50%" }}>
+                        <div style={{ background: "#F3E8FF", width: "40px", height: "40px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <Wallet size={20} color="#805AD5" />
                         </div>
                     </div>
