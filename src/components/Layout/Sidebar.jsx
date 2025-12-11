@@ -1,5 +1,6 @@
-import { Home, LayoutDashboard, Target, PieChart, Settings, LogOut, CalendarClock, X } from "lucide-react";
+import { Home, LayoutDashboard, Target, PieChart, Settings, LogOut, CalendarClock, X, Download } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { useTheme } from "../../context/ThemeContext";
@@ -17,6 +18,60 @@ export default function Sidebar({ isMobile, isOpen, onClose }) {
         { icon: <CalendarClock size={20} />, label: t('debts'), path: "/debts" },
         { icon: <Settings size={20} />, label: t('settings'), path: "/settings" },
     ];
+
+    // --- PWA Logic ---
+    const [installPrompt, setInstallPrompt] = useState(null);
+
+    useEffect(() => {
+        const handleBeforeInstallPrompt = (e) => {
+            // Prevent Chrome 67+ from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            setInstallPrompt(e);
+        };
+
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        };
+    }, []);
+
+    const handleInstallClick = async () => {
+        if (!installPrompt) return;
+        // Show the prompt
+        installPrompt.prompt();
+        // Wait for the user to respond to the prompt
+        const { outcome } = await installPrompt.userChoice;
+        console.log(`User response to the install prompt: ${outcome}`);
+        // We've used the prompt, and can't use it again, discard it
+        setInstallPrompt(null);
+    };
+
+    const InstallButton = () => (
+        installPrompt && (
+            <button
+                onClick={handleInstallClick}
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "1rem",
+                    padding: "1rem",
+                    borderRadius: "12px",
+                    color: "var(--primary)",
+                    background: "rgba(98, 0, 238, 0.1)",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: "1rem",
+                    fontWeight: "600",
+                    marginBottom: "0.5rem"
+                }}
+            >
+                <Download size={20} />
+                Instalar App
+            </button>
+        )
+    );
 
     if (isMobile) {
         return (
@@ -85,25 +140,27 @@ export default function Sidebar({ isMobile, isOpen, onClose }) {
                         ))}
                     </nav>
 
-                    <button
-                        onClick={logout}
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "1rem",
-                            padding: "1rem",
-                            borderRadius: "12px",
-                            color: "var(--error)",
-                            background: "transparent",
-                            border: "none",
-                            cursor: "pointer",
-                            marginTop: "auto",
-                            fontSize: "1rem"
-                        }}
-                    >
-                        <LogOut size={20} />
-                        {t('logout')}
-                    </button>
+                    <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                        <InstallButton />
+                        <button
+                            onClick={logout}
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "1rem",
+                                padding: "1rem",
+                                borderRadius: "12px",
+                                color: "var(--error)",
+                                background: "transparent",
+                                border: "none",
+                                cursor: "pointer",
+                                fontSize: "1rem"
+                            }}
+                        >
+                            <LogOut size={20} />
+                            {t('logout')}
+                        </button>
+                    </div>
                 </aside>
             </>
         );
@@ -152,25 +209,27 @@ export default function Sidebar({ isMobile, isOpen, onClose }) {
                 ))}
             </nav>
 
-            <button
-                onClick={logout}
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "1rem",
-                    padding: "1rem",
-                    borderRadius: "12px",
-                    color: "var(--error)",
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    marginTop: "auto",
-                    fontSize: "1rem"
-                }}
-            >
-                <LogOut size={20} />
-                {t('logout')}
-            </button>
+            <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                <InstallButton />
+                <button
+                    onClick={logout}
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "1rem",
+                        padding: "1rem",
+                        borderRadius: "12px",
+                        color: "var(--error)",
+                        background: "transparent",
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: "1rem"
+                    }}
+                >
+                    <LogOut size={20} />
+                    {t('logout')}
+                </button>
+            </div>
         </aside>
     );
 }
