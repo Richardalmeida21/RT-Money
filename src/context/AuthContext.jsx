@@ -52,8 +52,14 @@ export function AuthProvider({ children }) {
         };
     }, []);
 
-    const login = (email, password) => {
-        return signInWithEmailAndPassword(auth, email, password);
+    const login = async (email, password) => {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        // Ensure official user document exists (self-healing for legacy users)
+        await setDoc(doc(db, "users", userCredential.user.uid), {
+            email: email,
+            lastLogin: new Date().toISOString()
+        }, { merge: true });
+        return userCredential;
     };
 
     const register = async (email, password) => {
