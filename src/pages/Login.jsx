@@ -100,7 +100,7 @@ export default function Login() {
             overflowX: "hidden", // Prevent horizontal overflow
             overflowY: isMobile ? "auto" : "hidden", // Allow vertical scroll on mobile
             flexDirection: isMobile ? "column" : "row",
-            padding: isMobile ? "2rem 1rem" : "0", // Padding on mobile
+            padding: isMobile ? "1rem" : "0", // Padding on mobile
             boxSizing: "border-box"
         }}>
             {/* Left Side - Visual / Branding (Desktop Only) */}
@@ -233,7 +233,7 @@ export default function Login() {
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
-                padding: isMobile ? "2rem" : "2rem",
+                padding: isMobile ? "1.5rem" : "2rem",
                 position: "relative",
                 // Mobile Card Styles
                 backgroundColor: isMobile ? "white" : "transparent",
@@ -242,7 +242,7 @@ export default function Login() {
                 width: isMobile ? "100%" : "auto",
                 maxWidth: isMobile ? "480px" : "none",
                 minHeight: isMobile ? "auto" : "100%",
-                boxShadow: isMobile ? "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" : "none"
+                boxShadow: isMobile ? "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)" : "none"
             }}>
                 <div style={{ width: "100%", maxWidth: "440px" }}>
                     {isMobile && (
