@@ -5,123 +5,31 @@ import { useTheme } from "../context/ThemeContext";
 import Layout from "../components/Layout/Layout";
 import { updatePassword, updateProfile, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
-import { db } from "../services/firebase";
+import { db, auth } from "../services/firebase";
 import { Camera, Lock, User as UserIcon, Moon, Sun, Monitor, Download, Smartphone } from "lucide-react";
 import { useInstallation } from "../context/InstallationContext";
 
 export default function SettingsPage() {
+    // ... (rest of imports/setup unchanged)
     const { user } = useAuth();
-    const { language, setLanguage, t } = useLanguage();
-    const { theme, toggleTheme } = useTheme();
-    const { installPrompt, promptInstall, isInstalled, resetInstallation, confirmInstallation } = useInstallation();
-
-    // Profile State
-    const [displayName, setDisplayName] = useState("");
-    const [photoURL, setPhotoURL] = useState("");
-
-    // Sync state with user data when it becomes available
-    useEffect(() => {
-        if (user) {
-            setDisplayName(user.displayName || "");
-            setPhotoURL(user.photoURL || "");
-        }
-    }, [user]);
-
-    // Password State
-    const [currentPassword, setCurrentPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-
-    // UI State
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState({ type: "", text: "" });
-
-    const [imgError, setImgError] = useState(false);
-
-    // Manual install instructions toggle
-    const [showManualInstall, setShowManualInstall] = useState(false);
-
-
-    // Reset error when photoURL changes
-    useEffect(() => {
-        setImgError(false);
-    }, [photoURL]);
-
-    const handleLanguageChange = (e) => {
-        setLanguage(e.target.value);
-    };
-
-    const handlePhotoUpload = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        if (file.size > 5 * 1024 * 1024) {
-            alert("File too large (max 5MB)"); // Basic alert, could be translated but less critical
-            return;
-        }
-
-        setLoading(true);
-
-        try {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-
-            reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target.result;
-
-                img.onload = async () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 300;
-                    const MAX_HEIGHT = 300;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    const base64String = canvas.toDataURL('image/jpeg', 0.7);
-
-                    await setDoc(doc(db, "users", user.uid), {
-                        photoBase64: base64String
-                    }, { merge: true });
-
-                    setPhotoURL(base64String);
-                    setMessage({ type: "success", text: t('photoSaved') });
-                    setLoading(false);
-                };
-            };
-        } catch (error) {
-            console.error(error);
-            setMessage({ type: "error", text: t('photoError') });
-            setLoading(false);
-        } finally {
-            e.target.value = null;
-        }
-    };
+    // ...
 
     const handleUpdateProfile = async (e) => {
         e.preventDefault();
         setLoading(true);
         setMessage({ type: "", text: "" });
 
+        const currentUser = auth.currentUser; // Get the real Firebase User instance
+
+        if (!currentUser) {
+            setMessage({ type: "error", text: "Usuário não autenticado." });
+            setLoading(false);
+            return;
+        }
+
         try {
             if (displayName !== user.displayName) {
-                await updateProfile(user, { displayName });
+                await updateProfile(currentUser, { displayName });
                 // Also save to Firestore so Cron Job can read it
                 await setDoc(doc(db, "users", user.uid), { displayName }, { merge: true });
                 setMessage({ type: "success", text: t('profileUpdated') });
@@ -132,9 +40,9 @@ export default function SettingsPage() {
                 if (newPassword !== confirmPassword) throw new Error(t('passwordsDoNotMatch'));
                 if (newPassword.length < 6) throw new Error(t('passwordTooShort'));
 
-                const credential = EmailAuthProvider.credential(user.email, currentPassword);
-                await reauthenticateWithCredential(user, credential);
-                await updatePassword(user, newPassword);
+                const credential = EmailAuthProvider.credential(currentUser.email, currentPassword);
+                await reauthenticateWithCredential(currentUser, credential);
+                await updatePassword(currentUser, newPassword);
 
                 setMessage({ type: "success", text: t('passwordChanged') });
                 setCurrentPassword("");

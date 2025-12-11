@@ -82,6 +82,7 @@ export function AuthProvider({ children }) {
         // Ensure official user document exists
         await setDoc(doc(db, "users", userCredential.user.uid), {
             email: userCredential.user.email,
+            displayName: userCredential.user.displayName,
             lastLogin: new Date().toISOString()
         }, { merge: true });
         return userCredential;
