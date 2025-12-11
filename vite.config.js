@@ -36,7 +36,11 @@ export default defineConfig({
             type: 'image/png',
             purpose: 'any maskable'
           }
-        ]
+        ],
+        related_applications: [{
+          platform: 'webapp',
+          url: 'https://rt-money.vercel.app/manifest.webmanifest',
+        }]
       }
     })
   ],

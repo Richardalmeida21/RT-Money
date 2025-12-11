@@ -35,6 +35,17 @@ export function InstallationProvider({ children }) {
 
         if (isStandalone || storedInstalled) {
             setIsInstalled(true);
+        } else {
+            // Try to detect via API (Chrome 80+)
+            if ('getInstalledRelatedApps' in navigator) {
+                navigator.getInstalledRelatedApps().then((relatedApps) => {
+                    if (relatedApps.length > 0) {
+                        console.log('App detected as installed via API');
+                        setIsInstalled(true);
+                        localStorage.setItem('pwaInstalled', 'true');
+                    }
+                }).catch(err => console.log('Error checking installed apps:', err));
+            }
         }
 
         return () => {
