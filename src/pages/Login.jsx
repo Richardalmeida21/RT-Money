@@ -12,6 +12,15 @@ export default function Login() {
     const { user, login, register, loginWithGoogle } = useAuth();
     const navigate = useNavigate();
 
+    // Responsive State
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 1000);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 1000);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     // Animation Loop State
     const [activeStep, setActiveStep] = useState(0);
 
@@ -83,111 +92,117 @@ export default function Login() {
     return (
         <div style={{
             display: "flex",
-            height: "100vh",
+            minHeight: "100vh", // Use minHeight to allow scrolling
             width: "100vw",
-            backgroundColor: "#F8FAFC", // Clean light slate background
+            background: isMobile ? "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)" : "#F8FAFC",
             fontFamily: "'Inter', sans-serif",
             color: "#1E293B",
-            overflow: "hidden"
+            overflowX: "hidden", // Prevent horizontal overflow
+            overflowY: isMobile ? "auto" : "hidden", // Allow vertical scroll on mobile
+            flexDirection: isMobile ? "column" : "row",
+            padding: isMobile ? "2rem 1rem" : "0", // Padding on mobile
+            boxSizing: "border-box"
         }}>
-            {/* Left Side - Visual / Branding */}
-            <div style={{
-                flex: "1",
-                background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                color: "white",
-                padding: "4rem",
-                position: "relative",
-                // overflow: "hidden" // Removed to allow confetti to show
-            }}>
-                {/* Decorative Circles - Kept inside but might overflow now, which is fine or we can move them */}
-                <div style={{ position: "absolute", top: "-10%", left: "-10%", width: "400px", height: "400px", background: "rgba(255,255,255,0.1)", borderRadius: "50%" }} />
-                <div style={{ position: "absolute", bottom: "-5%", right: "-5%", width: "300px", height: "300px", background: "rgba(255,255,255,0.05)", borderRadius: "50%" }} />
+            {/* Left Side - Visual / Branding (Desktop Only) */}
+            {!isMobile && (
+                <div style={{
+                    flex: "1",
+                    background: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    color: "white",
+                    padding: "4rem",
+                    position: "relative",
+                    // overflow: "hidden" // Removed to allow confetti to show
+                }}>
+                    {/* Decorative Circles - Kept inside but might overflow now, which is fine or we can move them */}
+                    <div style={{ position: "absolute", top: "-10%", left: "-10%", width: "400px", height: "400px", background: "rgba(255,255,255,0.1)", borderRadius: "50%" }} />
+                    <div style={{ position: "absolute", bottom: "-5%", right: "-5%", width: "300px", height: "300px", background: "rgba(255,255,255,0.05)", borderRadius: "50%" }} />
 
-                <div style={{ zIndex: 1, textAlign: "center" }}>
-                    <img src="/logo-light.png" alt="RT Money" style={{ width: "300px", marginBottom: "1rem" }} />
-                    <h2 style={{ fontSize: "1.8rem", fontWeight: "bold", marginBottom: "0.5rem", maxWidth: "800px", lineHeight: "1.2" }}>
-                        Assuma o controle total da sua vida financeira.
-                    </h2>
-                    <p style={{ fontSize: "1.5rem", opacity: 0.9, marginBottom: "3rem", fontWeight: "500" }}>
-                        Simples, rápido e fácil.
-                    </p>
+                    <div style={{ zIndex: 1, textAlign: "center" }}>
+                        <img src="/logo-light.png" alt="RT Money" style={{ width: "300px", marginBottom: "1rem" }} />
+                        <h2 style={{ fontSize: "1.8rem", fontWeight: "bold", marginBottom: "0.5rem", maxWidth: "800px", lineHeight: "1.2" }}>
+                            Assuma o controle total da sua vida financeira.
+                        </h2>
+                        <p style={{ fontSize: "1.5rem", opacity: 0.9, marginBottom: "3rem", fontWeight: "500" }}>
+                            Simples, rápido e fácil.
+                        </p>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: "380px", margin: "0 auto" }}>
-                        {[
-                            "Gestão de Receitas e Despesas",
-                            "Metas Financeiras",
-                            "Controle de Dívidas"
-                        ].map((text, index) => {
-                            const isActive = activeStep >= index;
+                        <div style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: "380px", margin: "0 auto" }}>
+                            {[
+                                "Gestão de Receitas e Despesas",
+                                "Metas Financeiras",
+                                "Controle de Dívidas"
+                            ].map((text, index) => {
+                                const isActive = activeStep >= index;
 
-                            return (
-                                <div key={index} style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "1rem",
-                                    background: isActive ? "rgba(16, 185, 129, 0.2)" : "rgba(255, 255, 255, 0.1)", // Green tint when active
-                                    borderColor: isActive ? "rgba(16, 185, 129, 0.4)" : "rgba(255, 255, 255, 0.15)",
-                                    backdropFilter: "blur(10px)",
-                                    padding: "1rem 1.5rem",
-                                    borderRadius: "16px",
-                                    borderWidth: "1px",
-                                    borderStyle: "solid",
-                                    boxShadow: isActive ? "0 4px 12px rgba(16, 185, 129, 0.1)" : "0 4px 6px rgba(0, 0, 0, 0.05)",
-                                    transition: "all 0.5s ease",
-                                    transform: isActive ? "scale(1.02)" : "scale(1)",
-                                    position: "relative", // Ensure confetti is relative to this card
-                                    zIndex: isActive ? 10 : 1 // Ensure active card is on top
-                                }}>
-                                    <div style={{
-                                        background: isActive ? "#10B981" : "rgba(255, 255, 255, 0.2)",
-                                        borderRadius: "50%",
-                                        width: "32px",
-                                        height: "32px",
+                                return (
+                                    <div key={index} style={{
                                         display: "flex",
                                         alignItems: "center",
-                                        justifyContent: "center",
-                                        position: "relative",
-                                        transition: "background 0.3s ease"
+                                        gap: "1rem",
+                                        background: isActive ? "rgba(16, 185, 129, 0.2)" : "rgba(255, 255, 255, 0.1)", // Green tint when active
+                                        borderColor: isActive ? "rgba(16, 185, 129, 0.4)" : "rgba(255, 255, 255, 0.15)",
+                                        backdropFilter: "blur(10px)",
+                                        padding: "1rem 1.5rem",
+                                        borderRadius: "16px",
+                                        borderWidth: "1px",
+                                        borderStyle: "solid",
+                                        boxShadow: isActive ? "0 4px 12px rgba(16, 185, 129, 0.1)" : "0 4px 6px rgba(0, 0, 0, 0.05)",
+                                        transition: "all 0.5s ease",
+                                        transform: isActive ? "scale(1.02)" : "scale(1)",
+                                        position: "relative", // Ensure confetti is relative to this card
+                                        zIndex: isActive ? 10 : 1 // Ensure active card is on top
                                     }}>
-                                        {isActive && (
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path
-                                                    d="M20 6L9 17L4 12"
-                                                    stroke="white"
-                                                    strokeWidth="3"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    style={{
-                                                        strokeDasharray: 24,
-                                                        strokeDashoffset: 24,
-                                                        animation: "drawCheck 0.8s ease forwards"
-                                                    }}
-                                                />
-                                            </svg>
+                                        <div style={{
+                                            background: isActive ? "#10B981" : "rgba(255, 255, 255, 0.2)",
+                                            borderRadius: "50%",
+                                            width: "32px",
+                                            height: "32px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            position: "relative",
+                                            transition: "background 0.3s ease"
+                                        }}>
+                                            {isActive && (
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M20 6L9 17L4 12"
+                                                        stroke="white"
+                                                        strokeWidth="3"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        style={{
+                                                            strokeDasharray: 24,
+                                                            strokeDashoffset: 24,
+                                                            animation: "drawCheck 0.8s ease forwards"
+                                                        }}
+                                                    />
+                                                </svg>
+                                            )}
+                                        </div>
+                                        <span style={{ fontSize: "1.05rem", fontWeight: "500", color: isActive ? "#ecfdf5" : "white", transition: "color 0.3s" }}>{text}</span>
+
+                                        {/* Confetti Effect for the last item */}
+                                        {index === 2 && activeStep === 3 && (
+                                            <div style={{ position: "absolute", bottom: "-10px", left: "50%", transform: "translateX(-50%)" }}>
+                                                <div className="confetti" style={{ "--tx": "0px", "--ty": "-60px", "--c": "#10B981" }}></div>
+                                                <div className="confetti" style={{ "--tx": "50px", "--ty": "-30px", "--c": "#34D399" }}></div>
+                                                <div className="confetti" style={{ "--tx": "-50px", "--ty": "-30px", "--c": "#6EE7B7" }}></div>
+                                                <div className="confetti" style={{ "--tx": "30px", "--ty": "40px", "--c": "#F472B6" }}></div>
+                                                <div className="confetti" style={{ "--tx": "-30px", "--ty": "40px", "--c": "#60A5FA" }}></div>
+                                            </div>
                                         )}
                                     </div>
-                                    <span style={{ fontSize: "1.05rem", fontWeight: "500", color: isActive ? "#ecfdf5" : "white", transition: "color 0.3s" }}>{text}</span>
-
-                                    {/* Confetti Effect for the last item */}
-                                    {index === 2 && activeStep === 3 && (
-                                        <div style={{ position: "absolute", bottom: "-10px", left: "50%", transform: "translateX(-50%)" }}>
-                                            <div className="confetti" style={{ "--tx": "0px", "--ty": "-60px", "--c": "#10B981" }}></div>
-                                            <div className="confetti" style={{ "--tx": "50px", "--ty": "-30px", "--c": "#34D399" }}></div>
-                                            <div className="confetti" style={{ "--tx": "-50px", "--ty": "-30px", "--c": "#6EE7B7" }}></div>
-                                            <div className="confetti" style={{ "--tx": "30px", "--ty": "40px", "--c": "#F472B6" }}></div>
-                                            <div className="confetti" style={{ "--tx": "-30px", "--ty": "40px", "--c": "#60A5FA" }}></div>
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             <style>{`
                 @keyframes drawCheck {
@@ -213,15 +228,29 @@ export default function Login() {
 
             {/* Right Side - Form */}
             <div style={{
-                flex: "1",
+                flex: isMobile ? "0 0 auto" : "1",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
-                padding: "2rem",
-                position: "relative"
+                padding: isMobile ? "2rem" : "2rem",
+                position: "relative",
+                // Mobile Card Styles
+                backgroundColor: isMobile ? "white" : "transparent",
+                borderRadius: isMobile ? "24px" : "0",
+                margin: isMobile ? "auto" : "0",
+                width: isMobile ? "100%" : "auto",
+                maxWidth: isMobile ? "480px" : "none",
+                minHeight: isMobile ? "auto" : "100%",
+                boxShadow: isMobile ? "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" : "none"
             }}>
                 <div style={{ width: "100%", maxWidth: "440px" }}>
+                    {isMobile && (
+                        <div style={{ marginBottom: "2rem", textAlign: "center" }}>
+                            <img src="/logo-dark.png" alt="RT Money" style={{ width: "220px" }} />
+                        </div>
+                    )}
+
                     <div style={{ marginBottom: "2.5rem", textAlign: "center" }}>
                         <h2 style={{ fontSize: "2rem", fontWeight: "700", color: "#1E293B", marginBottom: "0.5rem" }}>
                             {isLogin ? "Bem-vindo de volta" : "Criar conta"}

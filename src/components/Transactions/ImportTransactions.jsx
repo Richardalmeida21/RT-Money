@@ -73,8 +73,18 @@ export default function ImportTransactions({ onClose, onImportComplete }) {
             }
         }
 
+        // Calculate min and max dates from successful imports
+        if (previewData.length > 0) {
+            const dates = previewData.map(t => t.date).sort();
+            const minDate = dates[0].split('-').reverse().join('/');
+            const maxDate = dates[dates.length - 1].split('-').reverse().join('/');
+
+            alert(`${count} transações importadas com sucesso!\n\nPeríodo: ${minDate} a ${maxDate}\n\nVerifique se o filtro de datas inclui este período para visualizá-las.`);
+        } else {
+            alert(`${count} transações importadas com sucesso!`);
+        }
+
         setImporting(false);
-        alert(`${count} transações importadas com sucesso!`);
         onImportComplete();
         onClose();
     };

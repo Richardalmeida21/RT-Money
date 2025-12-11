@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { Bell, ChevronDown, ChevronLeft, ChevronRight, Eye, EyeOff, User } from "lucide-react";
+import { Bell, ChevronDown, ChevronLeft, ChevronRight, Eye, EyeOff, User, Menu } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useFilter } from "../../context/FilterContext";
 import { useLanguage } from "../../context/LanguageContext";
 
 import { useLocation } from "react-router-dom";
 
-export default function Header() {
+export default function Header({ isMobile, toggleSidebar }) {
     const { user } = useAuth();
     const { filterParams, setFilterParams, isValuesVisible, setIsValuesVisible } = useFilter();
     const { t, language } = useLanguage();
@@ -38,14 +38,20 @@ export default function Header() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "0 2rem",
-            backgroundColor: "transparent"
+            padding: isMobile ? "0 1rem" : "0 2rem",
+            backgroundColor: "transparent",
+            gap: isMobile ? "0.5rem" : "1rem"
         }}>
-            <div>
-                {location.pathname === '/' && <h1 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>{t('dashboard')}</h1>}
+            <div style={{ display: "flex", alignItems: "center", gap: isMobile ? "0.5rem" : "1rem" }}>
+                {isMobile && (
+                    <button onClick={toggleSidebar} style={{ background: "none", border: "none", cursor: "pointer", display: "flex" }}>
+                        <Menu size={24} color="var(--text-primary)" />
+                    </button>
+                )}
+                {location.pathname === '/' && !isMobile && <h1 style={{ fontSize: "1.5rem", fontWeight: "bold", whiteSpace: "nowrap" }}>{t('dashboard')}</h1>}
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: isMobile ? "0.5rem" : "2rem", flex: 1, justifyContent: "flex-end" }}>
 
                 {/* Global Date Filter */}
                 <div style={{ position: "relative" }}>
@@ -54,7 +60,7 @@ export default function Header() {
                         alignItems: "center",
                         gap: "0.5rem",
                         background: "var(--surface)",
-                        padding: "0.5rem 1rem",
+                        padding: isMobile ? "0.4rem 0.6rem" : "0.5rem 1rem",
                         borderRadius: "20px",
                         boxShadow: "var(--shadow)",
                     }}>
@@ -62,23 +68,23 @@ export default function Header() {
                         <div
                             onClick={() => setShowPeriodMenu(!showPeriodMenu)}
                             style={{
-                                display: "flex", alignItems: "center", gap: "5px", cursor: "pointer",
-                                marginRight: "10px", paddingRight: "10px", borderRight: "1px solid var(--border)", fontWeight: "bold", fontSize: "0.85rem", color: "var(--text-secondary)"
+                                display: "flex", alignItems: "center", gap: "2px", cursor: "pointer",
+                                marginRight: "5px", paddingRight: "5px", borderRight: "1px solid var(--border)", fontWeight: "bold", fontSize: "0.85rem", color: "var(--text-secondary)"
                             }}>
-                            {filterParams.type === 'month' ? t('monthly') : t('period')} <ChevronDown size={14} />
+                            {isMobile ? <ChevronDown size={14} /> : <>{filterParams.type === 'month' ? t('monthly') : t('period')} <ChevronDown size={14} /></>}
                         </div>
 
                         {filterParams.type === 'month' ? (
                             <>
-                                <button onClick={() => handleMonthChange(-1)} style={{ border: "none", background: "none", cursor: "pointer", display: "flex" }}>
+                                <button onClick={() => handleMonthChange(-1)} style={{ border: "none", background: "none", cursor: "pointer", display: "flex", padding: 0 }}>
                                     <ChevronLeft size={16} color="var(--text-secondary)" />
                                 </button>
 
-                                <span style={{ minWidth: "100px", textAlign: "center", textTransform: "capitalize", fontWeight: "600", fontSize: "0.9rem", color: "var(--text-primary)" }}>
-                                    {monthName}
+                                <span style={{ minWidth: isMobile ? "auto" : "100px", textAlign: "center", textTransform: "capitalize", fontWeight: "600", fontSize: "0.9rem", color: "var(--text-primary)" }}>
+                                    {isMobile ? monthName.split(' ')[0].slice(0, 3) + (monthName.split(' ')[1] ? '/' + monthName.split(' ')[1].slice(2) : '') : monthName}
                                 </span>
 
-                                <button onClick={() => handleMonthChange(1)} style={{ border: "none", background: "none", cursor: "pointer", display: "flex" }}>
+                                <button onClick={() => handleMonthChange(1)} style={{ border: "none", background: "none", cursor: "pointer", display: "flex", padding: 0 }}>
                                     <ChevronRight size={16} color="var(--text-secondary)" />
                                 </button>
                             </>
@@ -88,14 +94,14 @@ export default function Header() {
                                     type="date"
                                     value={filterParams.startDate}
                                     onChange={(e) => setFilterParams({ ...filterParams, startDate: e.target.value })}
-                                    style={{ border: "1px solid var(--border)", borderRadius: "5px", padding: "2px 5px", fontSize: "0.8rem", width: "110px", background: "var(--background)", color: "var(--text-primary)" }}
+                                    style={{ border: "1px solid var(--border)", borderRadius: "5px", padding: "2px", fontSize: "0.7rem", width: isMobile ? "85px" : "110px", background: "var(--background)", color: "var(--text-primary)" }}
                                 />
-                                <span style={{ fontSize: "0.8rem", color: "#999" }}>{t('to')}</span>
+                                {!isMobile && <span style={{ fontSize: "0.8rem", color: "#999" }}>{t('to')}</span>}
                                 <input
                                     type="date"
                                     value={filterParams.endDate}
                                     onChange={(e) => setFilterParams({ ...filterParams, endDate: e.target.value })}
-                                    style={{ border: "1px solid var(--border)", borderRadius: "5px", padding: "2px 5px", fontSize: "0.8rem", width: "110px", background: "var(--background)", color: "var(--text-primary)" }}
+                                    style={{ border: "1px solid var(--border)", borderRadius: "5px", padding: "2px", fontSize: "0.7rem", width: isMobile ? "85px" : "110px", background: "var(--background)", color: "var(--text-primary)" }}
                                 />
                             </div>
                         )}
@@ -105,7 +111,7 @@ export default function Header() {
                         <div style={{
                             position: "absolute",
                             top: "110%",
-                            left: 0,
+                            right: 0,
                             background: "var(--surface)",
                             boxShadow: "var(--shadow)",
                             borderRadius: "12px",
@@ -130,25 +136,23 @@ export default function Header() {
                     )}
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: isMobile ? "0.5rem" : "1rem" }}>
                     <button
                         onClick={toggleMsg}
-                        style={{ background: "var(--surface)", border: "none", padding: "0.5rem", borderRadius: "50%", cursor: "pointer", boxShadow: "var(--shadow)" }}
+                        style={{ background: "var(--surface)", border: "none", padding: "0.5rem", borderRadius: "50%", cursor: "pointer", boxShadow: "var(--shadow)", display: "flex" }}
                         title={isValuesVisible ? "Ocultar valores" : "Mostrar valores"}
                     >
-                        {isValuesVisible ? <Eye size={20} color="var(--text-secondary)" /> : <EyeOff size={20} color="var(--text-secondary)" />}
+                        {isValuesVisible ? <Eye size={18} color="var(--text-secondary)" /> : <EyeOff size={18} color="var(--text-secondary)" />}
                     </button>
 
-                    <button style={{ background: "var(--surface)", border: "none", padding: "0.5rem", borderRadius: "50%", cursor: "pointer", boxShadow: "var(--shadow)" }}>
-                        <Bell size={20} color="var(--text-secondary)" />
-                    </button>
+                    {!isMobile && (
+                        <button style={{ background: "var(--surface)", border: "none", padding: "0.5rem", borderRadius: "50%", cursor: "pointer", boxShadow: "var(--shadow)", display: "flex" }}>
+                            <Bell size={20} color="var(--text-secondary)" />
+                        </button>
+                    )}
 
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                        <div style={{ width: "40px", height: "40px", backgroundColor: "#ddd", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-
-
-
-
+                        <div style={{ width: "35px", height: "35px", backgroundColor: "#ddd", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
                             {user?.photoURL && !imgError ? (
                                 <img
                                     src={user.photoURL}
@@ -157,13 +161,15 @@ export default function Header() {
                                     onError={() => setImgError(true)}
                                 />
                             ) : (
-                                <User size={24} color="#666" />
+                                <User size={20} color="#666" />
                             )}
                         </div>
-                        <div style={{ display: "flex", flexDirection: "column" }}>
-                            <span style={{ fontSize: "0.9rem", fontWeight: "600" }}>{user?.displayName || user?.email?.split('@')[0]}</span>
-                            <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>{t('userRole')}</span>
-                        </div>
+                        {!isMobile && (
+                            <div style={{ display: "flex", flexDirection: "column" }}>
+                                <span style={{ fontSize: "0.9rem", fontWeight: "600" }}>{user?.displayName || user?.email?.split('@')[0]}</span>
+                                <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>{t('userRole')}</span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

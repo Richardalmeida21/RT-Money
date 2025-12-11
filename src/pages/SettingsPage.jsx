@@ -148,7 +148,7 @@ export default function SettingsPage() {
             <div style={{ display: "flex", flexWrap: "wrap", gap: "2rem", alignItems: "flex-start" }}>
 
                 {/* Left Column: Personal Information */}
-                <div style={{ flex: "1", minWidth: "350px", background: "var(--surface)", padding: "2rem", borderRadius: "16px", boxShadow: "var(--shadow)" }}>
+                <div style={{ flex: "1", minWidth: "280px", background: "var(--surface)", padding: "2rem", borderRadius: "16px", boxShadow: "var(--shadow)" }}>
                     <h2 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                         <UserIcon size={20} /> {t('personalInfo')}
                     </h2>
@@ -253,7 +253,7 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Right Column: Preferences */}
-                <div style={{ flex: "1", minWidth: "300px", background: "var(--surface)", padding: "2rem", borderRadius: "16px", boxShadow: "var(--shadow)", height: "fit-content" }}>
+                <div style={{ flex: "1", minWidth: "280px", background: "var(--surface)", padding: "2rem", borderRadius: "16px", boxShadow: "var(--shadow)", height: "fit-content" }}>
                     <h2 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                         <Monitor size={20} /> {t('preferences')}
                     </h2>

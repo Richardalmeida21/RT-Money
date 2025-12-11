@@ -20,6 +20,13 @@ export default function TransactionsPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [filterType, setFilterType] = useState("all");
     const [selectedIds, setSelectedIds] = useState([]);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     useEffect(() => {
         fetchTransactions();
@@ -116,16 +123,19 @@ export default function TransactionsPage() {
 
     return (
         <Layout>
-            <div style={{ marginBottom: "2rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <h1 style={{ fontSize: "1.8rem", fontWeight: "bold" }}>{t('transactions')}</h1>
-                <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-                    <div style={{ color: "#666", marginRight: "1rem" }}>
+            <div style={{ marginBottom: "2rem", display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? "1rem" : "0" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "1rem", width: isMobile ? "100%" : "auto", justifyContent: isMobile ? "space-between" : "flex-start" }}>
+                    <h1 style={{ fontSize: isMobile ? "1.5rem" : "1.8rem", fontWeight: "bold" }}>{t('transactions')}</h1>
+                    <div style={{ color: "#666", fontSize: isMobile ? "0.9rem" : "1rem" }}>
                         {t('total')}: <strong>{filteredTransactions.length}</strong>
                     </div>
+                </div>
+
+                <div style={{ display: "flex", gap: "1rem", alignItems: "center", width: isMobile ? "100%" : "auto" }}>
                     <button
                         onClick={() => setShowAdd(true)}
                         style={{
-                            display: "flex", alignItems: "center", gap: "0.5rem",
+                            display: "flex", alignItems: "center", gap: "0.5rem", justifyContent: "center",
                             padding: "0.8rem 1.2rem",
                             background: "var(--primary)",
                             color: "white",
@@ -133,7 +143,9 @@ export default function TransactionsPage() {
                             borderRadius: "12px",
                             cursor: "pointer",
                             fontWeight: "bold",
-                            fontSize: "0.9rem"
+                            fontSize: "0.9rem",
+                            flex: isMobile ? 1 : "initial",
+                            whiteSpace: "nowrap"
                         }}
                     >
                         <Plus size={18} />
@@ -142,7 +154,7 @@ export default function TransactionsPage() {
                     <button
                         onClick={() => setShowImport(true)}
                         style={{
-                            display: "flex", alignItems: "center", gap: "0.5rem",
+                            display: "flex", alignItems: "center", gap: "0.5rem", justifyContent: "center",
                             padding: "0.8rem 1.2rem",
                             background: "white",
                             color: "#6200EE",
@@ -150,7 +162,9 @@ export default function TransactionsPage() {
                             borderRadius: "12px",
                             cursor: "pointer",
                             fontWeight: "bold",
-                            fontSize: "0.9rem"
+                            fontSize: "0.9rem",
+                            flex: isMobile ? 1 : "initial",
+                            whiteSpace: "nowrap"
                         }}
                     >
                         <UploadCloud size={18} />
@@ -225,14 +239,16 @@ export default function TransactionsPage() {
                         {filteredTransactions.map((transaction, index) => (
                             <div key={transaction.id} style={{
                                 display: "flex",
-                                alignItems: "center",
+                                flexDirection: isMobile ? "column" : "row",
+                                alignItems: isMobile ? "flex-start" : "center",
                                 justifyContent: "space-between",
                                 padding: "1.5rem",
+                                gap: isMobile ? "1rem" : "0",
                                 borderBottom: index !== filteredTransactions.length - 1 ? "1px solid var(--border)" : "none",
                                 transition: "background 0.2s",
                                 backgroundColor: selectedIds.includes(transaction.id) ? "#F3E8FF" : "var(--surface)"
                             }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", width: "100%" }}>
 
                                     <div onClick={() => toggleSelect(transaction.id)} style={{ cursor: "pointer" }}>
                                         {selectedIds.includes(transaction.id) ? (
@@ -252,7 +268,8 @@ export default function TransactionsPage() {
                                         background: "var(--background)",
                                         borderRadius: "12px",
                                         color: "var(--text-secondary)",
-                                        fontWeight: "bold"
+                                        fontWeight: "bold",
+                                        flexShrink: 0
                                     }}>
                                         <span style={{ fontSize: "0.9rem" }}>{transaction.date ? transaction.date.split('-')[2] : '--'}</span>
                                         <span style={{ fontSize: "0.7rem", textTransform: "uppercase" }}>
@@ -261,15 +278,15 @@ export default function TransactionsPage() {
                                         </span>
                                     </div>
 
-                                    <div>
-                                        <h3 style={{ fontSize: "1rem", marginBottom: "0.2rem", color: "var(--text-primary)" }}>{transaction.description}</h3>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <h3 style={{ fontSize: "1rem", marginBottom: "0.2rem", color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{transaction.description}</h3>
                                         <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
                                             {transaction.category === 'Geral' || transaction.category === 'Uncategorized' ? t('uncategorized') : transaction.category} • {transaction.type === 'income' ? t('credit') : t('debit')}
                                         </p>
                                     </div>
                                 </div>
 
-                                <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "2rem", width: isMobile ? "100%" : "auto", justifyContent: isMobile ? "space-between" : "flex-end", paddingLeft: isMobile ? "3.5rem" : "0" }}>
                                     <span style={{
                                         fontSize: "1.1rem",
                                         fontWeight: "bold",

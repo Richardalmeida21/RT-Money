@@ -155,7 +155,12 @@ export default function Dashboard() {
             </section>
 
             {/* Charts Section */}
-            <section style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1.5rem", marginBottom: "2rem" }}>
+            <section style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                gap: "1.5rem",
+                marginBottom: "2rem"
+            }}>
                 {/* Monthly Balance Chart */}
                 <div style={{ background: "var(--surface)", padding: "1.5rem", borderRadius: "16px", boxShadow: "var(--shadow)", minHeight: "300px" }}>
                     <h3 style={{ marginBottom: "1.5rem", color: "var(--text-primary)" }}>{t('monthlyBalance')}</h3>
