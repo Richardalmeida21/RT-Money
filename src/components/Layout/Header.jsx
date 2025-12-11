@@ -3,6 +3,8 @@ import { Bell, ChevronDown, ChevronLeft, ChevronRight, Eye, EyeOff, User, Menu }
 import { useAuth } from "../../context/AuthContext";
 import { useFilter } from "../../context/FilterContext";
 import { useLanguage } from "../../context/LanguageContext";
+import NotificationDropdown from "../Notifications/NotificationDropdown"; // Import Notification Component
+import { getDebts } from "../../services/dbService"; // Import service to fetch debts
 
 import { useLocation } from "react-router-dom";
 
@@ -13,12 +15,44 @@ export default function Header({ isMobile, toggleSidebar }) {
     const [showPeriodMenu, setShowPeriodMenu] = useState(false);
     const location = useLocation();
 
+    // Notification State
+    const [showNotifications, setShowNotifications] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
+
     const [imgError, setImgError] = useState(false);
 
     // Reset error if user photo changes
     useEffect(() => {
         setImgError(false);
     }, [user?.photoURL]);
+
+    // Fetch Notification Count
+    useEffect(() => {
+        const fetchCount = async () => {
+            if (!user) return;
+            try {
+                const debts = await getDebts(user.uid);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const count = debts.filter(debt => {
+                    if (debt.status === 'paid') return false;
+                    const dueDate = new Date(debt.dueDate + 'T00:00:00');
+                    const diffTime = dueDate - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    return diffDays <= 1; // Overdue, Today, Tomorrow
+                }).length;
+
+                setUnreadCount(count);
+            } catch (error) {
+                console.error("Failed to fetch notification count", error);
+            }
+        };
+
+        fetchCount();
+        const interval = setInterval(fetchCount, 60000); // Poll every minute
+        return () => clearInterval(interval);
+    }, [user]);
 
     const handleMonthChange = (direction) => {
         const [year, month] = filterParams.value.split('-').map(Number);
@@ -146,9 +180,29 @@ export default function Header({ isMobile, toggleSidebar }) {
                     </button>
 
                     {!isMobile && (
-                        <button style={{ background: "var(--surface)", border: "none", padding: "0.5rem", borderRadius: "50%", cursor: "pointer", boxShadow: "var(--shadow)", display: "flex" }}>
-                            <Bell size={20} color="var(--text-secondary)" />
-                        </button>
+                        <div style={{ position: "relative" }}>
+                            <button
+                                onClick={() => setShowNotifications(!showNotifications)}
+                                style={{ background: "var(--surface)", border: "none", padding: "0.5rem", borderRadius: "50%", cursor: "pointer", boxShadow: "var(--shadow)", display: "flex", position: "relative" }}
+                            >
+                                <Bell size={20} color="var(--text-secondary)" />
+                                {unreadCount > 0 && (
+                                    <span style={{
+                                        position: "absolute", top: "-2px", right: "-2px",
+                                        background: "#EF4444", color: "white",
+                                        fontSize: "0.6rem", fontWeight: "bold",
+                                        width: "16px", height: "16px", borderRadius: "50%",
+                                        display: "flex", alignItems: "center", justifyContent: "center",
+                                        border: "2px solid var(--surface)"
+                                    }}>
+                                        {unreadCount}
+                                    </span>
+                                )}
+                            </button>
+                            {showNotifications && (
+                                <NotificationDropdown userId={user.uid} onClose={() => setShowNotifications(false)} />
+                            )}
+                        </div>
                     )}
 
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
