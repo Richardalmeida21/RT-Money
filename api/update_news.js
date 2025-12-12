@@ -90,20 +90,21 @@ export default async function handler(req, res) {
         }
 
         const articles = articlesList.slice(0, 5).map(article => ({
-            source: article.source,
-            author: article.author,
-            title: article.title,
-            description: article.description,
-            content: article.content,
-            url: article.url,
-            urlToImage: article.urlToImage || null, // Handle missing images
+            source: article.source || { name: 'Desconhecido' },
+            author: article.author || "RT Money",
+            title: article.title || "Sem título",
+            description: article.description || "",
+            content: article.content || "",
+            url: article.url || "#",
+            urlToImage: article.urlToImage || null,
             publishedAt: article.publishedAt || new Date().toISOString()
         }));
 
         console.log(`✅ Fetched ${articles.length} articles. Saving to Firestore...`);
 
         // Save to existing 'system' collection, 'news' document
-        // We use set() to overwrite/update the latest news cache.
+        // We enable ignoreUndefinedProperties just in case, or rely on our sanitization above.
+        // Actually, best to just sanitize.
         await db.collection('system').doc('news').set({
             articles: articles,
             lastUpdated: admin.firestore.FieldValue.serverTimestamp()
