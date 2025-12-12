@@ -61,15 +61,43 @@ export default async function handler(req, res) {
             throw new Error(`NewsAPI Error: ${data.message}`);
         }
 
-        const articles = data.articles.slice(0, 5).map(article => ({
+        // --- HARD FALLBACK (MOCK) ---
+        // If even the general headlines are empty (API Limit/Block), use static helpful tips
+        let articlesList = data.articles || [];
+
+        if (data.totalResults === 0 || articlesList.length === 0) {
+            console.log("⚠️ API returned 0 results again. Using hardcoded fallback.");
+            articlesList = [
+                {
+                    title: "Dicas de Economia: Como organizar seu orçamento mensal",
+                    description: "Aprenda a regra 50/30/20 para dividir seus gastos e garantir que sobre dinheiro no fim do mês.",
+                    url: "https://rt-money.vercel.app",
+                    source: { name: "RT Money Dicas" }
+                },
+                {
+                    title: "Reserva de Emergência: Por que você precisa de uma?",
+                    description: "Especialistas recomendam ter pelo menos 6 meses de custo de vida guardados para imprevistos.",
+                    url: "https://rt-money.vercel.app",
+                    source: { name: "RT Money Dicas" }
+                },
+                {
+                    title: "Mercado Financeiro: Acompanhe seus investimentos",
+                    description: "Mantenha o hábito de revisar suas metas financeiras e investimentos periodicamente.",
+                    url: "https://rt-money.vercel.app",
+                    source: { name: "RT Money Dicas" }
+                }
+            ];
+        }
+
+        const articles = articlesList.slice(0, 5).map(article => ({
             source: article.source,
             author: article.author,
             title: article.title,
             description: article.description,
             content: article.content,
             url: article.url,
-            urlToImage: article.urlToImage,
-            publishedAt: article.publishedAt
+            urlToImage: article.urlToImage || null, // Handle missing images
+            publishedAt: article.publishedAt || new Date().toISOString()
         }));
 
         console.log(`✅ Fetched ${articles.length} articles. Saving to Firestore...`);
