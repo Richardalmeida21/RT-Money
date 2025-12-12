@@ -116,7 +116,89 @@ export default async function handler(req, res) {
             }
         }
 
-        return res.status(200).json({ success: true, emailsSent });
+
+
+        // --- 2. Check for Recurring Debts Generation (Run on Last Day of Month) ---
+        // Force trigger with ?force=true
+        const forceRecurring = req.query.force === 'true';
+
+        // Check if today is the last day of the month
+        // We look at "tomorrow" in Sao Paulo time to be safe? 
+        // Simple heuristic: Add 24h. If date is 1, today is last day.
+        const tomorrowCheck = new Date(today);
+        tomorrowCheck.setDate(today.getDate() + 1);
+        const isLastDayOfMonth = tomorrowCheck.getDate() === 1;
+
+        console.log(`🔄 Cron Status: Last Day of Month? ${isLastDayOfMonth} | Force? ${forceRecurring}`);
+
+        let recurringGenerated = 0;
+
+        if (isLastDayOfMonth || forceRecurring) {
+            console.log("🚀 Starting Recurring Debt Generation for Next Month...");
+
+            // Calculate "End of Next Month" to catch everything due next month
+            const nextMonth = new Date(today);
+            nextMonth.setMonth(nextMonth.getMonth() + 2); // Jump to 2 months ahead
+            nextMonth.setDate(0); // Go back to last day of "Next Month"
+            const endOfNextMonthStr = nextMonth.toISOString().split('T')[0];
+
+            console.log(`📅 Searching for templates with NextDueDate <= ${endOfNextMonthStr}`);
+
+            const recurringSnapshot = await db.collectionGroup("recurring_debts")
+                .where("nextDueDate", "<=", endOfNextMonthStr)
+                .get();
+
+            if (!recurringSnapshot.empty) {
+                for (const doc of recurringSnapshot.docs) {
+                    const templateData = doc.data();
+                    const parentUserRef = doc.ref.parent.parent;
+
+                    if (!parentUserRef) continue;
+
+                    console.log(`🔄 Generating: ${templateData.template.title} for ${parentUserRef.id} - Due: ${templateData.nextDueDate}`);
+
+                    // 1. Create the new debt instance
+                    await parentUserRef.collection("debts").add({
+                        ...templateData.template,
+                        dueDate: templateData.nextDueDate,
+                        status: 'pending',
+                        isRecurringInstance: true,
+                        createdAt: admin.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    // 2. Update the template for the SUBSEQUENT month (Month + 2)
+                    const [year, month, day] = templateData.nextDueDate.split('-').map(Number);
+                    // month is 1-based from split. JS Date uses 0-based.
+                    // Current Due Date:
+                    const currentDueDate = new Date(year, month - 1, day);
+
+                    // Add 1 month to get the NEW next due date
+                    currentDueDate.setMonth(currentDueDate.getMonth() + 1);
+
+                    const targetMonth = currentDueDate.getMonth();
+                    const targetYear = currentDueDate.getFullYear();
+                    const originalDay = templateData.template.originalDay || day;
+
+                    // Handle end of month edge cases (e.g. Jan 31 -> Feb 28)
+                    const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
+                    const finalDay = Math.min(originalDay, daysInMonth);
+
+                    const nextDueDateObj = new Date(targetYear, targetMonth, finalDay);
+                    const nextDueDateStr = nextDueDateObj.toISOString().split('T')[0];
+
+                    await doc.ref.update({
+                        nextDueDate: nextDueDateStr,
+                        lastGenerated: admin.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    recurringGenerated++;
+                }
+            }
+        } else {
+            console.log("⏳ Skipping Recurring Debts (Not End of Month).");
+        }
+
+        return res.status(200).json({ success: true, emailsSent, recurringGenerated });
 
     } catch (error) {
         console.error("Critical Worker Error:", error);

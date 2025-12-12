@@ -104,6 +104,7 @@ export const deleteGoal = async (userId, goalId) => {
 
 export const addDebt = async (userId, debt) => {
     try {
+        // 1. Add the actual debt instance
         const docRef = await addDoc(collection(db, "users", userId, "debts"), {
             ...debt,
             amount: parseFloat(debt.amount),
@@ -111,6 +112,32 @@ export const addDebt = async (userId, debt) => {
             status: 'pending', // pending, paid
             createdAt: serverTimestamp()
         });
+
+        // 2. If recurring, save a template for future generation
+        if (debt.isRecurring) {
+            // Calculate next month's due date for the first future generation
+            // Note: Simplistic next month calc, can be refined
+            const [year, month, day] = debt.dueDate.split('-').map(Number);
+            const nextDate = new Date(year, month, day); // month + 1 normally, but month is 0-indexed in JS Date? Wait. 
+            // Input string 2023-05-10. split -> 2023, 5, 10.
+            // new Date(2023, 5, 10). Month 5 is June. So it is next month. Correct.
+
+            const nextDueDateStr = nextDate.toISOString().split('T')[0];
+
+            await addDoc(collection(db, "users", userId, "recurring_debts"), {
+                template: {
+                    title: debt.title,
+                    amount: parseFloat(debt.amount),
+                    notificationMethod: debt.notificationMethod,
+                    contactInfo: debt.contactInfo,
+                    originalDay: day // Keep the day to anchor future dates
+                },
+                nextDueDate: nextDueDateStr,
+                lastGenerated: serverTimestamp(),
+                createdAt: serverTimestamp()
+            });
+        }
+
         return { id: docRef.id, ...debt };
     } catch (e) {
         console.error("Error adding debt: ", e);

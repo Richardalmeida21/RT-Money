@@ -3,9 +3,9 @@ import { Bell, ChevronDown, ChevronLeft, ChevronRight, Eye, EyeOff, User, Menu }
 import { useAuth } from "../../context/AuthContext";
 import { useFilter } from "../../context/FilterContext";
 import { useLanguage } from "../../context/LanguageContext";
-import NotificationDropdown from "../Notifications/NotificationDropdown"; // Import Notification Component
-import { getDebts } from "../../services/dbService"; // Import service to fetch debts
-
+import NotificationDropdown from "../Notifications/NotificationDropdown";
+import NewsModal from "../Notifications/NewsModal";
+import { useNotifications } from "../../hooks/useNotifications"; // Import new hook
 import { useLocation } from "react-router-dom";
 
 export default function Header({ isMobile, toggleSidebar }) {
@@ -15,44 +15,24 @@ export default function Header({ isMobile, toggleSidebar }) {
     const [showPeriodMenu, setShowPeriodMenu] = useState(false);
     const location = useLocation();
 
-    // Notification State
-    const [showNotifications, setShowNotifications] = useState(false);
-    const [unreadCount, setUnreadCount] = useState(0);
+    // Use Hook
+    const {
+        debts,
+        news,
+        unreadCount,
+        markAsRead,
+        markAllNewsAsRead,
+        loading: loadingNotif
+    } = useNotifications(user?.uid);
 
+    const [showNotifications, setShowNotifications] = useState(false);
+    const [selectedNews, setSelectedNews] = useState(null);
     const [imgError, setImgError] = useState(false);
 
     // Reset error if user photo changes
     useEffect(() => {
         setImgError(false);
     }, [user?.photoURL]);
-
-    // Fetch Notification Count
-    useEffect(() => {
-        const fetchCount = async () => {
-            if (!user) return;
-            try {
-                const debts = await getDebts(user.uid);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                const count = debts.filter(debt => {
-                    if (debt.status === 'paid') return false;
-                    const dueDate = new Date(debt.dueDate + 'T00:00:00');
-                    const diffTime = dueDate - today;
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                    return diffDays <= 1; // Overdue, Today, Tomorrow
-                }).length;
-
-                setUnreadCount(count);
-            } catch (error) {
-                console.error("Failed to fetch notification count", error);
-            }
-        };
-
-        fetchCount();
-        const interval = setInterval(fetchCount, 60000); // Poll every minute
-        return () => clearInterval(interval);
-    }, [user]);
 
     const handleMonthChange = (direction) => {
         const [year, month] = filterParams.value.split('-').map(Number);
@@ -183,9 +163,14 @@ export default function Header({ isMobile, toggleSidebar }) {
                         <div style={{ position: "relative" }}>
                             <button
                                 onClick={() => setShowNotifications(!showNotifications)}
-                                style={{ background: "var(--surface)", border: "none", padding: "0.5rem", borderRadius: "50%", cursor: "pointer", boxShadow: "var(--shadow)", display: "flex", position: "relative" }}
+                                style={{
+                                    background: "var(--surface)", border: "none", padding: "0.5rem", borderRadius: "50%",
+                                    cursor: "pointer", boxShadow: "var(--shadow)", display: "flex", position: "relative",
+                                    animation: unreadCount > 0 ? "bell-shake 3s infinite" : "none",
+                                    transformOrigin: "top center"
+                                }}
                             >
-                                <Bell size={20} color="var(--text-secondary)" />
+                                <Bell size={20} color={unreadCount > 0 ? "var(--primary)" : "var(--text-secondary)"} />
                                 {unreadCount > 0 && (
                                     <span style={{
                                         position: "absolute", top: "-2px", right: "-2px",
@@ -193,16 +178,51 @@ export default function Header({ isMobile, toggleSidebar }) {
                                         fontSize: "0.6rem", fontWeight: "bold",
                                         width: "16px", height: "16px", borderRadius: "50%",
                                         display: "flex", alignItems: "center", justifyContent: "center",
-                                        border: "2px solid var(--surface)"
+                                        border: "2px solid var(--surface)",
+                                        boxShadow: "0 0 0 2px rgba(239, 68, 68, 0.4)",
+                                        animation: "pulse 2s infinite"
                                     }}>
                                         {unreadCount}
                                     </span>
                                 )}
                             </button>
+                            <style>{`
+                                @keyframes bell-shake {
+                                    0% { transform: rotate(0); }
+                                    5% { transform: rotate(15deg); }
+                                    10% { transform: rotate(-15deg); }
+                                    15% { transform: rotate(10deg); }
+                                    20% { transform: rotate(-10deg); }
+                                    25% { transform: rotate(5deg); }
+                                    30% { transform: rotate(-5deg); }
+                                    35% { transform: rotate(0); }
+                                    100% { transform: rotate(0); }
+                                }
+                                @keyframes pulse {
+                                    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+                                    70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+                                    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+                                }
+                            `}</style>
                             {showNotifications && (
-                                <NotificationDropdown userId={user.uid} onClose={() => setShowNotifications(false)} />
+                                <NotificationDropdown
+                                    onClose={() => setShowNotifications(false)}
+                                    debts={debts}
+                                    news={news}
+                                    markAsRead={markAsRead}
+                                    markAllNewsAsRead={markAllNewsAsRead}
+                                    onSelectNews={(newsItem) => {
+                                        setShowNotifications(false);
+                                        markAsRead(newsItem.id);
+                                        setSelectedNews(newsItem);
+                                    }}
+                                />
                             )}
                         </div>
+                    )}
+
+                    {selectedNews && (
+                        <NewsModal news={selectedNews} onClose={() => setSelectedNews(null)} />
                     )}
 
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>

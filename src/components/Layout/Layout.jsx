@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 
+import WhatsNewModal from "./WhatsNewModal";
+
 export default function Layout({ children }) {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1000);
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -14,6 +16,7 @@ export default function Layout({ children }) {
 
     return (
         <div style={{ display: "flex", minHeight: "100vh", position: "relative" }}>
+            <WhatsNewModal />
             <Sidebar isMobile={isMobile} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
             <div style={{

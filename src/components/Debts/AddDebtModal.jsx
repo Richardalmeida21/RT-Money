@@ -9,6 +9,7 @@ export default function AddDebtModal({ onClose, onSave, editingDebt }) {
     const [dueDate, setDueDate] = useState("");
     const [notificationMethod, setNotificationMethod] = useState("none"); // none, email, sms, both
     const [contactInfo, setContactInfo] = useState(""); // email or phone
+    const [isRecurring, setIsRecurring] = useState(false);
     const [loading, setLoading] = useState(false);
 
     // Toggle for custom email
@@ -49,6 +50,7 @@ export default function AddDebtModal({ onClose, onSave, editingDebt }) {
                 dueDate,
                 notificationMethod,
                 contactInfo,
+                isRecurring,
                 status: editingDebt ? editingDebt.status : 'pending'
             });
             onClose();
@@ -110,6 +112,23 @@ export default function AddDebtModal({ onClose, onSave, editingDebt }) {
                                 style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid var(--border)", background: "var(--background)", color: "var(--text-primary)" }}
                             />
                         </div>
+                    </div>
+
+                    {/* Recurrence Section */}
+                    <div style={{ background: "var(--background)", padding: "1rem", borderRadius: "8px", border: "1px dashed var(--border)" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem", color: "var(--primary)", fontWeight: "bold" }}>
+                            <span style={{ fontSize: "1.2rem" }}>🔁</span>
+                            <span>Repetir Mensalmente?</span>
+                        </div>
+                        <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.9rem", color: "var(--text-secondary)", cursor: "pointer" }}>
+                            <input
+                                type="checkbox"
+                                checked={isRecurring}
+                                onChange={(e) => setIsRecurring(e.target.checked)}
+                                style={{ transform: "scale(1.2)", cursor: "pointer" }}
+                            />
+                            Sim, essa é uma conta fixa (Cria automaticamente todo mês)
+                        </label>
                     </div>
 
                     {/* Notification Section */}
