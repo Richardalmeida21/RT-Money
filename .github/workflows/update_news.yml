@@ -12,5 +12,11 @@ jobs:
   cron:
     runs-on: ubuntu-latest
     steps:
-      - name: Call Update News API
+      - name: Call Update News API (3x Daily)
         run: curl -s https://rt-money.vercel.app/api/update_news
+
+  daily_checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call System Checks & Reminders (Daily)
+        run: curl -s https://rt-money.vercel.app/api/cron
