@@ -47,7 +47,15 @@ export default async function handler(req, res) {
             `https://newsapi.org/v2/top-headlines?country=br&category=business&apiKey=${apiKey}`
         );
 
-        const data = await response.json();
+        let data = await response.json();
+
+        if (data.status === 'ok' && data.totalResults === 0) {
+            console.log("⚠️ No business news found. Fetching general headlines...");
+            const fallbackResponse = await fetch(
+                `https://newsapi.org/v2/top-headlines?country=br&apiKey=${apiKey}`
+            );
+            data = await fallbackResponse.json();
+        }
 
         if (data.status !== 'ok') {
             throw new Error(`NewsAPI Error: ${data.message}`);
