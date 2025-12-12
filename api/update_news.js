@@ -1,5 +1,5 @@
 import admin from 'firebase-admin';
-import fetch from 'node-fetch'; // Vercel supports node-fetch or global fetch in Node 18+
+
 
 // --- CONFIGURATION ---
 // NEWS_API_KEY must be set in Vercel Env Vars
