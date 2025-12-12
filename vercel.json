@@ -3,10 +3,6 @@
         {
             "path": "/api/cron",
             "schedule": "0 9 * * *"
-        },
-        {
-            "path": "/api/update_news",
-            "schedule": "0 9,13,18 * * *"
         }
     ],
     "rewrites": [

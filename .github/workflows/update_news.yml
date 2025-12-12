@@ -1,0 +1,16 @@
+name: Update News
+on:
+  schedule:
+    # Horários convertidos para UTC (Brasil UTC-3):
+    # 09:00 BRT -> 12:00 UTC
+    # 14:00 BRT -> 17:00 UTC
+    # 19:00 BRT -> 22:00 UTC
+    - cron: '0 12,17,22 * * *'
+  workflow_dispatch: # Permite rodar manualmente pelo GitHub se precisar
+
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Update News API
+        run: curl -s https://rt-money.vercel.app/api/update_news

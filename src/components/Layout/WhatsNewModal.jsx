@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { X, Newspaper, Repeat, Bell, Smartphone } from "lucide-react";
 
-const CURRENT_VERSION = "2.2.6"; // Increment this to show modal again
+const CURRENT_VERSION = "2.2.8"; // Increment this to show modal again
 
 export default function WhatsNewModal() {
     const [show, setShow] = useState(false);
