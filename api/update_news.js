@@ -73,7 +73,17 @@ export default async function handler(req, res) {
             lastUpdated: admin.firestore.FieldValue.serverTimestamp()
         });
 
-        return res.status(200).json({ success: true, articlesCount: articles.length });
+        return res.status(200).json({
+            success: true,
+            articlesCount: articles.length,
+            debug: {
+                totalResults: data.totalResults,
+                status: data.status,
+                rawFirstArticle: data.articles[0] ? 'Exists' : 'None',
+                // Returning full data might be too big, but let's check basic metadata
+                msg: data.message || 'No message'
+            }
+        });
 
     } catch (error) {
         console.error("News Update Error:", error);
