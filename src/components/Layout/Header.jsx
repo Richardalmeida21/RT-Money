@@ -159,34 +159,33 @@ export default function Header({ isMobile, toggleSidebar }) {
                         {isValuesVisible ? <Eye size={18} color="var(--text-secondary)" /> : <EyeOff size={18} color="var(--text-secondary)" />}
                     </button>
 
-                    {!isMobile && (
-                        <div style={{ position: "relative" }}>
-                            <button
-                                onClick={() => setShowNotifications(!showNotifications)}
-                                style={{
-                                    background: "var(--surface)", border: "none", padding: "0.5rem", borderRadius: "50%",
-                                    cursor: "pointer", boxShadow: "var(--shadow)", display: "flex", position: "relative",
-                                    animation: unreadCount > 0 ? "bell-shake 3s infinite" : "none",
-                                    transformOrigin: "top center"
-                                }}
-                            >
-                                <Bell size={20} color={unreadCount > 0 ? "var(--primary)" : "var(--text-secondary)"} />
-                                {unreadCount > 0 && (
-                                    <span style={{
-                                        position: "absolute", top: "-2px", right: "-2px",
-                                        background: "#EF4444", color: "white",
-                                        fontSize: "0.6rem", fontWeight: "bold",
-                                        width: "16px", height: "16px", borderRadius: "50%",
-                                        display: "flex", alignItems: "center", justifyContent: "center",
-                                        border: "2px solid var(--surface)",
-                                        boxShadow: "0 0 0 2px rgba(239, 68, 68, 0.4)",
-                                        animation: "pulse 2s infinite"
-                                    }}>
-                                        {unreadCount}
-                                    </span>
-                                )}
-                            </button>
-                            <style>{`
+                    <div style={{ position: "relative" }}>
+                        <button
+                            onClick={() => setShowNotifications(!showNotifications)}
+                            style={{
+                                background: "var(--surface)", border: "none", padding: "0.5rem", borderRadius: "50%",
+                                cursor: "pointer", boxShadow: "var(--shadow)", display: "flex", position: "relative",
+                                animation: unreadCount > 0 ? "bell-shake 3s infinite" : "none",
+                                transformOrigin: "top center"
+                            }}
+                        >
+                            <Bell size={20} color={unreadCount > 0 ? "var(--primary)" : "var(--text-secondary)"} />
+                            {unreadCount > 0 && (
+                                <span style={{
+                                    position: "absolute", top: "-2px", right: "-2px",
+                                    background: "#EF4444", color: "white",
+                                    fontSize: "0.6rem", fontWeight: "bold",
+                                    width: "16px", height: "16px", borderRadius: "50%",
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    border: "2px solid var(--surface)",
+                                    boxShadow: "0 0 0 2px rgba(239, 68, 68, 0.4)",
+                                    animation: "pulse 2s infinite"
+                                }}>
+                                    {unreadCount}
+                                </span>
+                            )}
+                        </button>
+                        <style>{`
                                 @keyframes bell-shake {
                                     0% { transform: rotate(0); }
                                     5% { transform: rotate(15deg); }
@@ -204,22 +203,21 @@ export default function Header({ isMobile, toggleSidebar }) {
                                     100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
                                 }
                             `}</style>
-                            {showNotifications && (
-                                <NotificationDropdown
-                                    onClose={() => setShowNotifications(false)}
-                                    debts={debts}
-                                    news={news}
-                                    markAsRead={markAsRead}
-                                    markAllNewsAsRead={markAllNewsAsRead}
-                                    onSelectNews={(newsItem) => {
-                                        setShowNotifications(false);
-                                        markAsRead(newsItem.id);
-                                        setSelectedNews(newsItem);
-                                    }}
-                                />
-                            )}
-                        </div>
-                    )}
+                        {showNotifications && (
+                            <NotificationDropdown
+                                onClose={() => setShowNotifications(false)}
+                                debts={debts}
+                                news={news}
+                                markAsRead={markAsRead}
+                                markAllNewsAsRead={markAllNewsAsRead}
+                                onSelectNews={(newsItem) => {
+                                    setShowNotifications(false);
+                                    markAsRead(newsItem.id);
+                                    setSelectedNews(newsItem);
+                                }}
+                            />
+                        )}
+                    </div>
 
                     {selectedNews && (
                         <NewsModal news={selectedNews} onClose={() => setSelectedNews(null)} />
