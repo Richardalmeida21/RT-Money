@@ -44,6 +44,26 @@ export default function DebtsPage() {
     const handleSaveDebt = async (debtData) => {
         if (editingDebt) {
             await updateDebt(user.uid, editingDebt.id, debtData);
+        } else if (debtData.isInstallment && debtData.installments > 1) {
+            // Create one debt entry per installment
+            const groupId = `inst_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+            const total = debtData.installments;
+            const [year, month, day] = debtData.dueDate.split('-').map(Number);
+
+            for (let i = 1; i <= total; i++) {
+                // Offset due date by (i-1) months
+                const d = new Date(year, month - 1 + (i - 1), day);
+                const dueDateStr = d.toISOString().split('T')[0];
+                await addDebt(user.uid, {
+                    ...debtData,
+                    title: `${debtData.title} (${i}/${total})`,
+                    dueDate: dueDateStr,
+                    installmentNumber: i,
+                    totalInstallments: total,
+                    installmentGroupId: groupId,
+                    isRecurring: false,
+                });
+            }
         } else {
             await addDebt(user.uid, debtData);
         }

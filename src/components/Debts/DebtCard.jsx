@@ -36,6 +36,21 @@ export default function DebtCard({ debt, onPay, onEdit, onDelete }) {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                 <div>
                     <h3 style={{ fontSize: "1.1rem", fontWeight: "bold", color: "var(--text-primary)", marginBottom: "0.2rem" }}>{debt.title}</h3>
+                    {debt.isInstallment && (
+                        <div style={{
+                            display: "inline-flex", alignItems: "center", gap: "0.3rem",
+                            background: "linear-gradient(135deg, #E9D8FD, #F3E8FF)",
+                            color: "#553C9A",
+                            fontSize: "0.75rem",
+                            fontWeight: "bold",
+                            padding: "2px 8px",
+                            borderRadius: "20px",
+                            border: "1px solid #D6BCFA",
+                            marginBottom: "0.3rem"
+                        }}>
+                            💳 Parcela {debt.installmentNumber}/{debt.totalInstallments}
+                        </div>
+                    )}
                     <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", color: statusInfo.color, fontSize: "0.85rem", fontWeight: "600" }}>
                         {statusInfo.icon}
                         <span>{statusInfo.label}</span>
